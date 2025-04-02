@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { fetchWeatherAlerts } from "./services/weatherService";
 import { motion, AnimatePresence } from "framer-motion";
+import { Menu } from "lucide-react";
 
 function App() {
   const [alerts, setAlerts] = useState([]);
@@ -9,13 +10,18 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [selectedAlertType, setSelectedAlertType] = useState("All");
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
+
+  const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
 
   const filteredAlerts = alerts.filter(
     (alert) =>
       alert.properties.senderName &&
-      alert.properties.senderName.toLowerCase().includes("nws peachtree city")
+      alert.properties.senderName.toLowerCase().includes("nws peachtree city") &&
+      (selectedAlertType === "All" || alert.properties.event === selectedAlertType)
   );
 
   useEffect(() => {
@@ -124,8 +130,37 @@ function App() {
 
       <h1 className="text-3xl font-bold text-center mb-2">NWS Peachtree City Alerts</h1>
 
-      <div className="text-center text-lg font-semibold bg-gray-800 px-6 py-2 rounded-full border-2 border-white shadow-md mb-6">
-        Active Alerts: {filteredAlerts.length}
+      <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="text-lg font-semibold bg-gray-800 px-6 py-2 rounded-full border-2 border-white shadow-md">
+          Active Alerts: {filteredAlerts.length}
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={() => setShowFilterMenu(!showFilterMenu)}
+            className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition"
+            aria-label="Toggle Filter Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          {showFilterMenu && (
+            <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-48 p-3">
+              <label htmlFor="alertType" className="block text-sm mb-1">Filter by Alert Type:</label>
+              <select
+                id="alertType"
+                value={selectedAlertType}
+                onChange={(e) => setSelectedAlertType(e.target.value)}
+                className="bg-gray-700 border border-white text-white p-2 w-full rounded-md"
+              >
+                <option value="All">All</option>
+                {allAlertTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="text-sm text-gray-400 mb-4">
