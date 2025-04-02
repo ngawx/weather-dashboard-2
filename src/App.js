@@ -10,18 +10,27 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState(null);
-  const [selectedAlertType, setSelectedAlertType] = useState("All");
+  const [selectedAlertTypes, setSelectedAlertTypes] = useState([]);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
   const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
 
+  const handleAlertTypeChange = (event) => {
+    const value = event.target.value;
+    setSelectedAlertTypes((prev) =>
+      prev.includes(value)
+        ? prev.filter((type) => type !== value)
+        : [...prev, value]
+    );
+  };
+
   const filteredAlerts = alerts.filter(
     (alert) =>
       alert.properties.senderName &&
       alert.properties.senderName.toLowerCase().includes("nws peachtree city") &&
-      (selectedAlertType === "All" || alert.properties.event === selectedAlertType)
+      (selectedAlertTypes.length === 0 || selectedAlertTypes.includes(alert.properties.event))
   );
 
   useEffect(() => {
@@ -145,19 +154,22 @@ function App() {
           </button>
 
           {showFilterMenu && (
-            <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-48 p-3">
-              <label htmlFor="alertType" className="block text-sm mb-1">Filter by Alert Type:</label>
-              <select
-                id="alertType"
-                value={selectedAlertType}
-                onChange={(e) => setSelectedAlertType(e.target.value)}
-                className="bg-gray-700 border border-white text-white p-2 w-full rounded-md"
-              >
-                <option value="All">All</option>
+            <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-60 p-3">
+              <p className="block text-sm mb-2 font-semibold">Filter by Alert Types:</p>
+              <div className="max-h-60 overflow-y-auto space-y-1">
                 {allAlertTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <label key={type} className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      value={type}
+                      checked={selectedAlertTypes.includes(type)}
+                      onChange={handleAlertTypeChange}
+                      className="form-checkbox bg-gray-700 border-white text-white"
+                    />
+                    <span>{type}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
           )}
         </div>
