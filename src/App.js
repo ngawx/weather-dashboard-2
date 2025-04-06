@@ -15,37 +15,6 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
-  const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
-
-  const handleAlertTypeChange = (event) => {
-    const value = event.target.value;
-    setSelectedAlertTypes((prev) =>
-      prev.includes(value)
-        ? prev.filter((type) => type !== value)
-        : [...prev, value]
-    );
-  };
-
-  const filteredAlerts = alerts.filter(
-    (alert) =>
-      alert.properties.senderName &&
-      alert.properties.senderName.toLowerCase().includes("nws peachtree city") &&
-      (selectedAlertTypes.length === 0 || selectedAlertTypes.includes(alert.properties.event))
-  );
-
-  useEffect(() => {
-    if (!autoScroll || filteredAlerts.length <= alertsPerPage) return;
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = prevIndex + alertsPerPage;
-        return nextIndex >= filteredAlerts.length ? 0 : nextIndex;
-      });
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [filteredAlerts, autoScroll]);
-
   useEffect(() => {
     const loadAlerts = async () => {
       try {
@@ -57,11 +26,62 @@ function App() {
         setAlerts([]);
       }
     };
-
     loadAlerts();
     const interval = setInterval(loadAlerts, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
+
+  const handleAlertTypeChange = (event) => {
+    const value = event.target.value;
+    setSelectedAlertTypes((prev) =>
+      prev.includes(value)
+        ? prev.filter((type) => type !== value)
+        : [...prev, value]
+    );
+  };
+
+  const filteredAlerts = alerts.filter((alert) => {
+    const { event, senderName, effective, expires } = alert.properties;
+    const isFromFFC = senderName?.toLowerCase().includes("nws peachtree city");
+    const matchesType = selectedAlertTypes.length === 0 || selectedAlertTypes.includes(event);
+    const now = new Date();
+    const effectiveTime = new Date(effective);
+    const expiresTime = new Date(expires);
+    const isActiveOrFuture = (!isNaN(effectiveTime) && effectiveTime <= now && expiresTime >= now) || (effectiveTime >= now);
+    return isFromFFC && matchesType && isActiveOrFuture;
+  });
+
+  const ffcActiveAlertCount = filteredAlerts.length;
+
+  const countByType = (typeKeywords) =>
+    alerts.filter((alert) => {
+      const { senderName, event } = alert.properties;
+      return (
+        senderName?.toLowerCase().includes("nws peachtree city") &&
+        typeKeywords.some((kw) => event.toLowerCase().includes(kw))
+      );
+    }).length;
+
+  const counts = {
+    tornadoWarnings: countByType(["tornado warning"]),
+    severeThunderstormWarnings: countByType(["severe thunderstorm warning"]),
+    severeWatches: countByType(["tornado watch", "severe thunderstorm watch"]),
+    floodWarnings: countByType(["flood warning", "flash flood warning", "flood advisory", "flash flood advisory"]),
+    heatWarnings: countByType(["heat advisory", "excessive heat warning"]),
+  };
+
+  useEffect(() => {
+    if (!autoScroll || filteredAlerts.length <= alertsPerPage) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = prevIndex + alertsPerPage;
+        return nextIndex >= filteredAlerts.length ? 0 : nextIndex;
+      });
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [filteredAlerts, autoScroll]);
 
   useEffect(() => {
     const clock = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -118,6 +138,7 @@ function App() {
       "Frost Advisory": "bg-blue-300 border-blue-500",
       "Dense Fog Advisory": "bg-gray-700 border-gray-900",
       "Special Weather Statement": "bg-indigo-500 border-indigo-700",
+      "Flood Watch": "bg-green-500 border-green-700"
     };
     return colors[event] || "bg-gray-800 border-gray-600";
   };
@@ -131,102 +152,134 @@ function App() {
 
   const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
 
+  const alertInfo = {
+    severeWatches: "Counts Tornado Watch and Severe Thunderstorm Watch alerts from NWS Peachtree City.",
+    floodWarnings: "Includes Flood Warnings, Flash Flood Warnings, and related advisories.",
+    heatWarnings: "Includes Heat Advisories and Excessive Heat Warnings."
+  };
+
+  const handleBannerClick = (type) => {
+    if (alertInfo[type]) {
+      alert(alertInfo[type]);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center relative">
-      <div className="absolute top-4 left-6 text-lg font-mono">
-        {currentTime.toLocaleTimeString()} {timeSuffix}
+    <div className="min-h-screen bg-gray-900 text-white flex flex-row">
+      <div className="w-1/2 p-6">
+        <h2 className="text-xl font-semibold mb-2 text-center">Radar Reflectivity</h2>
+        <img
+          src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`}
+          alt="Radar Snapshot"
+          className="w-full h-full border border-white rounded shadow-md object-contain"
+        />
       </div>
 
-      <h1 className="text-3xl font-bold text-center mb-2">NWS Peachtree City Alerts</h1>
-
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <div className="text-lg font-semibold bg-gray-800 px-6 py-2 rounded-full border-2 border-white shadow-md">
-          Active Alerts: {filteredAlerts.length}
+      <div className="flex-1 p-6 flex flex-col items-center relative">
+        <div className="fixed top-4 left-4 text-lg font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+          {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="relative">
-          <button
-            onClick={() => setShowFilterMenu(!showFilterMenu)}
-            className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition"
-            aria-label="Toggle Filter Menu"
+        <div className="grid grid-cols-5 gap-2 mb-4 text-xs font-semibold">
+          <div className="bg-red-700 px-2 py-1 rounded text-center">Tornado Warnings: {counts.tornadoWarnings}</div>
+          <div className="bg-orange-500 px-2 py-1 rounded text-center">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
+          <div
+            className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline"
+            onClick={() => handleBannerClick("severeWatches")}
           >
-            <Menu className="w-5 h-5" />
-          </button>
+            Severe Watches: {counts.severeWatches}
+          </div>
+          <div
+            className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline"
+            onClick={() => handleBannerClick("floodWarnings")}
+          >
+            Flood Alerts: {counts.floodWarnings}
+          </div>
+          <div
+            className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline"
+            onClick={() => handleBannerClick("heatWarnings")}
+          >
+            Heat Alerts: {counts.heatWarnings}
+          </div>
+        </div>
 
-          {showFilterMenu && (
-            <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-60 p-3">
-              <p className="block text-sm mb-2 font-semibold">Filter by Alert Types:</p>
-              <div className="max-h-60 overflow-y-auto space-y-1">
-                {allAlertTypes.map((type) => (
-                  <label key={type} className="flex items-center space-x-2 text-sm">
-                    <input
-                      type="checkbox"
-                      value={type}
-                      checked={selectedAlertTypes.includes(type)}
-                      onChange={handleAlertTypeChange}
-                      className="form-checkbox bg-gray-700 border-white text-white"
-                    />
-                    <span>{type}</span>
-                  </label>
-                ))}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="text-lg font-semibold bg-gray-800 px-6 py-2 rounded-full border-2 border-white shadow-md">
+            Active Alerts: {ffcActiveAlertCount}
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition"
+              aria-label="Toggle Filter Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-60 p-3">
+                <p className="block text-sm mb-2 font-semibold">Filter by Alert Types:</p>
+                <div className="max-h-60 overflow-y-auto space-y-1">
+                  {allAlertTypes.map((type) => (
+                    <label key={type} className="flex items-center space-x-2 text-sm">
+                      <input
+                        type="checkbox"
+                        value={type}
+                        checked={selectedAlertTypes.includes(type)}
+                        onChange={handleAlertTypeChange}
+                        className="form-checkbox bg-gray-700 border-white text-white"
+                      />
+                      <span>{type}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-400 mb-4">
+          Last Refreshed: {lastUpdated || "Loading..."}
+        </p>
+
+        <div className="w-full max-w-md">
+          {filteredAlerts.length === 0 ? (
+            <div className="text-center text-gray-400">No active alerts from NWS Peachtree City.</div>
+          ) : (
+            <AnimatePresence mode="wait">
+              {visibleAlerts.map((alert, index) => {
+                const { event, areaDesc, effective, expires } = alert.properties;
+                const alertStyle = getAlertStyles(event);
+                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;/g, ", ") || "Unknown";
+                return (
+                  <motion.div
+                    key={index}
+                    onClick={() => handleTileClick(index)}
+                    className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm max-w-sm mx-auto relative overflow-hidden`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <h2 className="text-base font-semibold leading-snug">{event}</h2>
+                    <p className="text-[10px] mt-1 mb-4">
+                      🕒 <strong>Effective:</strong> {formatTime(effective)}
+                      <br />
+                      ⏳ <strong>Expires:</strong> {formatTime(expires)}
+                    </p>
+                    <div className="absolute bottom-1 left-0 w-full overflow-hidden bg-opacity-0">
+                      <div className="whitespace-nowrap animate-marquee text-[10px] text-gray-300 px-2">
+                        📍 <strong>Counties Affected:</strong> {counties}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           )}
         </div>
-      </div>
 
-      <p className="text-sm text-gray-400 mb-4">
-        Last Refreshed: {lastUpdated || "Loading..."}
-      </p>
-
-      <div className="w-full max-w-md">
-        {filteredAlerts.length === 0 ? (
-          <div className="text-center text-gray-400">No active alerts from NWS Peachtree City.</div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {visibleAlerts.map((alert, index) => {
-              const {
-                event,
-                areaDesc,
-                effective,
-                expires,
-              } = alert.properties;
-
-              const alertStyle = getAlertStyles(event);
-              const counties = areaDesc?.replace(/;/g, ", ") || "Unknown";
-              const isExpanded = expandedIndex === index;
-
-              return (
-                <motion.div
-                  key={index}
-                  onClick={() => handleTileClick(index)}
-                  className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm max-w-sm mx-auto`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <h2 className="text-base font-semibold leading-snug">{event}</h2>
-
-                  <p className="text-[10px] mt-1">
-                    🕒 <strong>Effective:</strong> {formatTime(effective)}
-                    <br />
-                    ⏳ <strong>Expires:</strong> {formatTime(expires)}
-                  </p>
-
-                  {isExpanded && (
-                    <p className="text-[10px] mt-1 text-gray-300">
-                      📍 <strong>Counties Affected:</strong> {counties}
-                    </p>
-                  )}
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        )}
-      </div>
-
-      {filteredAlerts.length > alertsPerPage && (
         <div className="mt-4 flex gap-4">
           <button
             onClick={handlePrev}
@@ -241,11 +294,23 @@ function App() {
             Next ▶
           </button>
         </div>
-      )}
 
-      <footer className="text-xs text-gray-500 mt-10 text-center">
-        © 2025 P.J. Gudz. All rights reserved.
-      </footer>
+        <footer className="text-xs text-gray-500 mt-10 text-center">
+          © 2025 P.J. Gudz. All rights reserved.
+        </footer>
+      </div>
+
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          display: inline-block;
+          white-space: nowrap;
+          animation: marquee 30s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
