@@ -79,7 +79,7 @@ function App() {
         const nextIndex = prevIndex + alertsPerPage;
         return nextIndex >= filteredAlerts.length ? 0 : nextIndex;
       });
-    }, 8000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [filteredAlerts, autoScroll]);
 
@@ -165,42 +165,29 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-row">
-      <div className="w-1/2 p-6">
-        <h2 className="text-xl font-semibold mb-2 text-center">Radar Reflectivity</h2>
+    <div className="min-h-screen bg-gray-900 text-white flex flex-row pt-0">
+      <div className="w-1/2 px-6 pt-1">
+        <div className="text-xl font-semibold text-center mb-1">Radar Reflectivity</div>
         <img
           src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`}
           alt="Radar Snapshot"
-          className="w-full h-full border border-white rounded shadow-md object-contain"
+          className="w-full h-full object-contain"
         />
       </div>
 
-      <div className="flex-1 p-6 flex flex-col items-center relative">
-        <div className="fixed top-4 left-4 text-lg font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+      <div className="flex-1 px-6 flex flex-col items-center relative">
+        <div className="fixed top-2 left-4 text-lg font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="grid grid-cols-5 gap-2 mb-4 text-xs font-semibold">
+        <div className="text-2xl font-bold mt-1 mb-2 text-center">NWS Peachtree City Alerts</div>
+
+        <div className="grid grid-cols-5 gap-2 mb-3 text-xs font-semibold">
           <div className="bg-red-700 px-2 py-1 rounded text-center">Tornado Warnings: {counts.tornadoWarnings}</div>
           <div className="bg-orange-500 px-2 py-1 rounded text-center">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
-          <div
-            className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline"
-            onClick={() => handleBannerClick("severeWatches")}
-          >
-            Severe Watches: {counts.severeWatches}
-          </div>
-          <div
-            className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline"
-            onClick={() => handleBannerClick("floodWarnings")}
-          >
-            Flood Alerts: {counts.floodWarnings}
-          </div>
-          <div
-            className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline"
-            onClick={() => handleBannerClick("heatWarnings")}
-          >
-            Heat Alerts: {counts.heatWarnings}
-          </div>
+          <div className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("severeWatches")}>Severe Watches: {counts.severeWatches}</div>
+          <div className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("floodWarnings")}>Flood Alerts: {counts.floodWarnings}</div>
+          <div className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("heatWarnings")}>Heat Alerts: {counts.heatWarnings}</div>
         </div>
 
         <div className="flex items-center gap-4 mb-4">
@@ -239,11 +226,7 @@ function App() {
           </div>
         </div>
 
-        <p className="text-sm text-gray-400 mb-4">
-          Last Refreshed: {lastUpdated || "Loading..."}
-        </p>
-
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-xl mx-auto">
           {filteredAlerts.length === 0 ? (
             <div className="text-center text-gray-400">No active alerts from NWS Peachtree City.</div>
           ) : (
@@ -251,7 +234,7 @@ function App() {
               {visibleAlerts.map((alert, index) => {
                 const { event, areaDesc, effective, expires } = alert.properties;
                 const alertStyle = getAlertStyles(event);
-                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;/g, ", ") || "Unknown";
+                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;+/g, ", ").replace(/^,|,$/g, "") || "Unknown";
                 return (
                   <motion.div
                     key={index}
@@ -295,7 +278,7 @@ function App() {
           </button>
         </div>
 
-        <footer className="text-xs text-gray-500 mt-10 text-center">
+        <footer className="text-xs text-gray-500 mt-8 text-center">
           © 2025 P.J. Gudz. All rights reserved.
         </footer>
       </div>
@@ -308,7 +291,7 @@ function App() {
         .animate-marquee {
           display: inline-block;
           white-space: nowrap;
-          animation: marquee 30s linear infinite;
+          animation: marquee 15s linear infinite;
         }
       `}</style>
     </div>
