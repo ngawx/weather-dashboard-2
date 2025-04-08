@@ -156,36 +156,34 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-row pt-0">
-      <div className="w-1/2 px-6 pt-5">
-        <div className="flex justify-center gap-2 mb-1">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4">
+      <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
+        <div className="flex justify-center gap-2 mb-2">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
           <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
         </div>
         <img
           src={selectedMap === "radar" ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}` : "https://www.weather.gov/images/ffc/big/GA_WWA.png"}
           alt="Map Display"
-          className="w-full h-full object-contain"
+          className="w-full h-auto object-contain rounded"
         />
       </div>
 
-      <div className="flex-1 p-0 pt-0 flex flex-col items-center relative">
-        <div className="fixed top-2 left-4 text-lg font-mono z-50 bg-gray-00 px-2 py-1 rounded shadow">
+      <div className="w-full lg:w-1/2 flex flex-col items-center">
+        <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="grid grid-cols-5 gap-2 mb-4 text-xs font-semibold">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-4 mb-6 text-xs font-semibold">
           <div className="bg-red-700 px-2 py-1 rounded text-center">Tornado Warnings: {counts.tornadoWarnings}</div>
           <div className="bg-orange-500 px-2 py-1 rounded text-center">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
-          <div className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("severeWatches")}>Severe Watches: {counts.severeWatches}</div>
-          <div className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("floodWarnings")}>Flood Alerts: {counts.floodWarnings}</div>
-          <div className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("heatWarnings")}>Heat Alerts: {counts.heatWarnings}</div>
+          <div onClick={() => handleBannerClick("severeWatches")} className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline">Severe Watches: {counts.severeWatches}</div>
+          <div onClick={() => handleBannerClick("floodWarnings")} className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline">Flood Alerts: {counts.floodWarnings}</div>
+          <div onClick={() => handleBannerClick("heatWarnings")} className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline">Heat Alerts: {counts.heatWarnings}</div>
         </div>
 
-        <div className="flex items-center gap-4 mb-4">
-          <div className="text-lg font-semibold bg-gray-800 px-6 py-2 rounded-full border-2 border-white shadow-md">
-            Active Alerts: {ffcActiveAlertCount}
-          </div>
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+          <div className="text-sm sm:text-lg font-semibold bg-gray-800 px-4 sm:px-6 py-2 rounded-full border-2 border-white shadow-md">Active Alerts: {ffcActiveAlertCount}</div>
 
           <div className="relative">
             <button onClick={() => setShowFilterMenu(!showFilterMenu)} className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition" aria-label="Toggle Filter Menu">
@@ -250,7 +248,7 @@ function App() {
           <button onClick={handleNext} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">Next ▶</button>
         </div>
 
-        <footer className="text-xs text-gray-500 mt-10 text-center">© 2025 P.J. Gudz. All rights reserved.</footer>
+        <footer className="text-xs text-gray-500 mt-10 text-center px-4">© 2025 P.J. Gudz. All rights reserved.</footer>
       </div>
 
       <style>{`
@@ -261,7 +259,7 @@ function App() {
         .animate-marquee {
           display: inline-block;
           white-space: nowrap;
-          animation: marquee 30s linear infinite;
+          animation: marquee 20s linear infinite;
         }
       `}</style>
     </div>
