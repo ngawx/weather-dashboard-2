@@ -12,6 +12,7 @@ function App() {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [selectedAlertTypes, setSelectedAlertTypes] = useState([]);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [selectedMap, setSelectedMap] = useState("radar");
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
@@ -36,9 +37,7 @@ function App() {
   const handleAlertTypeChange = (event) => {
     const value = event.target.value;
     setSelectedAlertTypes((prev) =>
-      prev.includes(value)
-        ? prev.filter((type) => type !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((type) => type !== value) : [...prev, value]
     );
   };
 
@@ -49,7 +48,7 @@ function App() {
     const now = new Date();
     const effectiveTime = new Date(effective);
     const expiresTime = new Date(expires);
-    const isActiveOrFuture = (!isNaN(effectiveTime) && effectiveTime <= now && expiresTime >= now) || (effectiveTime >= now);
+    const isActiveOrFuture = (!isNaN(effectiveTime) && effectiveTime <= now && expiresTime >= now) || effectiveTime >= now;
     return isFromFFC && matchesType && isActiveOrFuture;
   });
 
@@ -103,21 +102,15 @@ function App() {
 
   const handleNext = () => {
     pauseAndResumeAutoScroll();
-    setCurrentIndex((prev) =>
-      (prev + alertsPerPage) >= filteredAlerts.length ? 0 : prev + alertsPerPage
-    );
+    setCurrentIndex((prev) => (prev + alertsPerPage) >= filteredAlerts.length ? 0 : prev + alertsPerPage);
   };
 
   const handlePrev = () => {
     pauseAndResumeAutoScroll();
-    setCurrentIndex((prev) =>
-      prev === 0 ? Math.max(filteredAlerts.length - alertsPerPage, 0) : prev - alertsPerPage
-    );
+    setCurrentIndex((prev) => prev === 0 ? Math.max(filteredAlerts.length - alertsPerPage, 0) : prev - alertsPerPage);
   };
 
-  const isDaylightSaving = currentTime
-    .toLocaleString("en-US", { timeZoneName: "short" })
-    .includes("DT");
+  const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
   const getAlertStyles = (event) => {
@@ -145,9 +138,7 @@ function App() {
 
   const formatTime = (timeString) => {
     if (!timeString) return "Unknown";
-    return new Date(timeString).toLocaleString("en-US", {
-      timeZoneName: "short",
-    });
+    return new Date(timeString).toLocaleString("en-US", { timeZoneName: "short" });
   };
 
   const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
@@ -166,23 +157,24 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-row pt-0">
-      <div className="w-1/2 px-6 pt-1">
-        <div className="text-xl font-semibold text-center mb-1">Radar Reflectivity</div>
+      <div className="w-1/2 px-6 pt-5">
+        <div className="flex justify-center gap-2 mb-1">
+          <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+          <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+        </div>
         <img
-          src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`}
-          alt="Radar Snapshot"
+          src={selectedMap === "radar" ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}` : "https://www.weather.gov/images/ffc/big/GA_WWA.png"}
+          alt="Map Display"
           className="w-full h-full object-contain"
         />
       </div>
 
-      <div className="flex-1 px-6 flex flex-col items-center relative">
-        <div className="fixed top-2 left-4 text-lg font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+      <div className="flex-1 p-0 pt-0 flex flex-col items-center relative">
+        <div className="fixed top-2 left-4 text-lg font-mono z-50 bg-gray-00 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="text-2xl font-bold mt-1 mb-2 text-center">NWS Peachtree City Alerts</div>
-
-        <div className="grid grid-cols-5 gap-2 mb-3 text-xs font-semibold">
+        <div className="grid grid-cols-5 gap-2 mb-4 text-xs font-semibold">
           <div className="bg-red-700 px-2 py-1 rounded text-center">Tornado Warnings: {counts.tornadoWarnings}</div>
           <div className="bg-orange-500 px-2 py-1 rounded text-center">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
           <div className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline" onClick={() => handleBannerClick("severeWatches")}>Severe Watches: {counts.severeWatches}</div>
@@ -196,27 +188,16 @@ function App() {
           </div>
 
           <div className="relative">
-            <button
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
-              className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition"
-              aria-label="Toggle Filter Menu"
-            >
+            <button onClick={() => setShowFilterMenu(!showFilterMenu)} className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition" aria-label="Toggle Filter Menu">
               <Menu className="w-5 h-5" />
             </button>
-
             {showFilterMenu && (
               <div className="absolute right-0 mt-2 bg-gray-800 border border-white rounded-md shadow-md z-10 w-60 p-3">
                 <p className="block text-sm mb-2 font-semibold">Filter by Alert Types:</p>
                 <div className="max-h-60 overflow-y-auto space-y-1">
                   {allAlertTypes.map((type) => (
                     <label key={type} className="flex items-center space-x-2 text-sm">
-                      <input
-                        type="checkbox"
-                        value={type}
-                        checked={selectedAlertTypes.includes(type)}
-                        onChange={handleAlertTypeChange}
-                        className="form-checkbox bg-gray-700 border-white text-white"
-                      />
+                      <input type="checkbox" value={type} checked={selectedAlertTypes.includes(type)} onChange={handleAlertTypeChange} className="form-checkbox bg-gray-700 border-white text-white" />
                       <span>{type}</span>
                     </label>
                   ))}
@@ -226,7 +207,9 @@ function App() {
           </div>
         </div>
 
-        <div className="w-full max-w-xl mx-auto">
+        <p className="text-sm text-gray-400 mb-4">Last Refreshed: {lastUpdated || "Loading..."}</p>
+
+        <div className="w-full max-w-md">
           {filteredAlerts.length === 0 ? (
             <div className="text-center text-gray-400">No active alerts from NWS Peachtree City.</div>
           ) : (
@@ -234,7 +217,7 @@ function App() {
               {visibleAlerts.map((alert, index) => {
                 const { event, areaDesc, effective, expires } = alert.properties;
                 const alertStyle = getAlertStyles(event);
-                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;+/g, ", ").replace(/^,|,$/g, "") || "Unknown";
+                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;/g, ", ") || "Unknown";
                 return (
                   <motion.div
                     key={index}
@@ -247,8 +230,7 @@ function App() {
                   >
                     <h2 className="text-base font-semibold leading-snug">{event}</h2>
                     <p className="text-[10px] mt-1 mb-4">
-                      🕒 <strong>Effective:</strong> {formatTime(effective)}
-                      <br />
+                      🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
                       ⏳ <strong>Expires:</strong> {formatTime(expires)}
                     </p>
                     <div className="absolute bottom-1 left-0 w-full overflow-hidden bg-opacity-0">
@@ -264,23 +246,11 @@ function App() {
         </div>
 
         <div className="mt-4 flex gap-4">
-          <button
-            onClick={handlePrev}
-            className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300"
-          >
-            ◀ Previous
-          </button>
-          <button
-            onClick={handleNext}
-            className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300"
-          >
-            Next ▶
-          </button>
+          <button onClick={handlePrev} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">◀ Previous</button>
+          <button onClick={handleNext} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">Next ▶</button>
         </div>
 
-        <footer className="text-xs text-gray-500 mt-8 text-center">
-          © 2025 P.J. Gudz. All rights reserved.
-        </footer>
+        <footer className="text-xs text-gray-500 mt-10 text-center">© 2025 P.J. Gudz. All rights reserved.</footer>
       </div>
 
       <style>{`
@@ -291,7 +261,7 @@ function App() {
         .animate-marquee {
           display: inline-block;
           white-space: nowrap;
-          animation: marquee 15s linear infinite;
+          animation: marquee 30s linear infinite;
         }
       `}</style>
     </div>
