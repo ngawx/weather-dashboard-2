@@ -32,6 +32,13 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
 
   const handleAlertTypeChange = (event) => {
@@ -69,49 +76,38 @@ function App() {
     severeWatches: countByType(["tornado watch", "severe thunderstorm watch"]),
     floodWarnings: countByType(["flood warning", "flash flood warning", "flood advisory", "flash flood advisory"]),
     heatWarnings: countByType(["heat advisory", "excessive heat warning"]),
+    coldWeather: countByType([
+      "freeze watch",
+      "freeze warning",
+      "frost advisory",
+      "cold weather advisory",
+      "cold weather warning",
+      "winter weather advisory",
+      "winter storm warning",
+      "blizzard warning"
+    ])
   };
 
-  useEffect(() => {
-    if (!autoScroll || filteredAlerts.length <= alertsPerPage) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = prevIndex + alertsPerPage;
-        return nextIndex >= filteredAlerts.length ? 0 : nextIndex;
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [filteredAlerts, autoScroll]);
-
-  useEffect(() => {
-    const clock = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(clock);
-  }, []);
-
-  const pauseAndResumeAutoScroll = () => {
-    setAutoScroll(false);
-    if (resumeTimeout.current) clearTimeout(resumeTimeout.current);
-    resumeTimeout.current = setTimeout(() => {
-      setAutoScroll(true);
-    }, 10000);
+  const alertInfo = {
+    severeWatches: "Counts Tornado Watch and Severe Thunderstorm Watch alerts from NWS Peachtree City.",
+    floodWarnings: "Includes Flood Warnings, Flash Flood Warnings, and related advisories.",
+    heatWarnings: "Includes Heat Advisories and Excessive Heat Warnings.",
+    coldWeather: "Includes Freeze Watches/Warnings, Frost Advisories, Cold Weather Advisories, Winter Storm Warnings, and Blizzard Warnings."
   };
 
-  const handleTileClick = (index) => {
-    pauseAndResumeAutoScroll();
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  };
-
-  const handleNext = () => {
-    pauseAndResumeAutoScroll();
-    setCurrentIndex((prev) => (prev + alertsPerPage) >= filteredAlerts.length ? 0 : prev + alertsPerPage);
-  };
-
-  const handlePrev = () => {
-    pauseAndResumeAutoScroll();
-    setCurrentIndex((prev) => prev === 0 ? Math.max(filteredAlerts.length - alertsPerPage, 0) : prev - alertsPerPage);
+  const handleBannerClick = (type) => {
+    if (alertInfo[type]) {
+      alert(alertInfo[type]);
+    }
   };
 
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "Unknown";
+    return new Date(timeString).toLocaleString("en-US", { timeZoneName: "short" });
+  };
 
   const getAlertStyles = (event) => {
     const colors = {
@@ -136,24 +132,7 @@ function App() {
     return colors[event] || "bg-gray-800 border-gray-600";
   };
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "Unknown";
-    return new Date(timeString).toLocaleString("en-US", { timeZoneName: "short" });
-  };
-
   const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
-
-  const alertInfo = {
-    severeWatches: "Counts Tornado Watch and Severe Thunderstorm Watch alerts from NWS Peachtree City.",
-    floodWarnings: "Includes Flood Warnings, Flash Flood Warnings, and related advisories.",
-    heatWarnings: "Includes Heat Advisories and Excessive Heat Warnings."
-  };
-
-  const handleBannerClick = (type) => {
-    if (alertInfo[type]) {
-      alert(alertInfo[type]);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4">
@@ -174,16 +153,19 @@ function App() {
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-4 mb-6 text-xs font-semibold">
-          <div className="bg-red-700 px-2 py-1 rounded text-center">Tornado Warnings: {counts.tornadoWarnings}</div>
-          <div className="bg-orange-500 px-2 py-1 rounded text-center">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
-          <div onClick={() => handleBannerClick("severeWatches")} className="bg-yellow-500 px-2 py-1 rounded text-center cursor-pointer hover:underline">Severe Watches: {counts.severeWatches}</div>
-          <div onClick={() => handleBannerClick("floodWarnings")} className="bg-green-600 px-2 py-1 rounded text-center cursor-pointer hover:underline">Flood Alerts: {counts.floodWarnings}</div>
-          <div onClick={() => handleBannerClick("heatWarnings")} className="bg-orange-400 px-2 py-1 rounded text-center cursor-pointer hover:underline">Heat Alerts: {counts.heatWarnings}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mt-4 mb-6 text-xs font-semibold w-full text-center">
+          <div className="bg-red-700 px-2 py-1 rounded">Tornado Warnings: {counts.tornadoWarnings}</div>
+          <div className="bg-orange-500 px-2 py-1 rounded">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
+          <div onClick={() => handleBannerClick("severeWatches")} className="bg-yellow-500 px-2 py-1 rounded cursor-pointer hover:underline">Severe Watches: {counts.severeWatches}</div>
+          <div onClick={() => handleBannerClick("floodWarnings")} className="bg-green-600 px-2 py-1 rounded cursor-pointer hover:underline">Flood Alerts: {counts.floodWarnings}</div>
+          <div onClick={() => handleBannerClick("heatWarnings")} className="bg-orange-400 px-2 py-1 rounded cursor-pointer hover:underline">Heat Alerts: {counts.heatWarnings}</div>
+          <div onClick={() => handleBannerClick("coldWeather")} className="bg-blue-600 px-2 py-1 rounded cursor-pointer hover:underline">Cold Weather Alerts: {counts.coldWeather}</div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-          <div className="text-sm sm:text-lg font-semibold bg-gray-800 px-4 sm:px-6 py-2 rounded-full border-2 border-white shadow-md">Active Alerts: {ffcActiveAlertCount}</div>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md">
+            Active Alerts: {ffcActiveAlertCount}
+          </div>
 
           <div className="relative">
             <button onClick={() => setShowFilterMenu(!showFilterMenu)} className="bg-gray-800 p-2 rounded-full border border-white hover:bg-gray-700 transition" aria-label="Toggle Filter Menu">
@@ -205,7 +187,7 @@ function App() {
           </div>
         </div>
 
-        <p className="text-sm text-gray-400 mb-4">Last Refreshed: {lastUpdated || "Loading..."}</p>
+        <div className="text-sm text-gray-400 mb-4">Last Refreshed: {lastUpdated || "Loading..."}</div>
 
         <div className="w-full max-w-md">
           {filteredAlerts.length === 0 ? (
@@ -219,7 +201,7 @@ function App() {
                 return (
                   <motion.div
                     key={index}
-                    onClick={() => handleTileClick(index)}
+                    onClick={() => setExpandedIndex(index)}
                     className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm max-w-sm mx-auto relative overflow-hidden`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -244,11 +226,11 @@ function App() {
         </div>
 
         <div className="mt-4 flex gap-4">
-          <button onClick={handlePrev} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">◀ Previous</button>
-          <button onClick={handleNext} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">Next ▶</button>
+          <button onClick={() => setCurrentIndex((prev) => prev === 0 ? Math.max(filteredAlerts.length - alertsPerPage, 0) : prev - alertsPerPage)} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">◀ Previous</button>
+          <button onClick={() => setCurrentIndex((prev) => (prev + alertsPerPage) >= filteredAlerts.length ? 0 : prev + alertsPerPage)} className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">Next ▶</button>
         </div>
 
-        <footer className="text-xs text-gray-500 mt-10 text-center px-4">© 2025 P.J. Gudz. All rights reserved.</footer>
+        <footer className="text-xs text-gray-500 mb-4 mt-8 text-center px-2">© 2025 P.J. Gudz. All rights reserved.</footer>
       </div>
 
       <style>{`
