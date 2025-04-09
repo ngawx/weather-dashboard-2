@@ -84,7 +84,8 @@ function App() {
       "cold weather warning",
       "winter weather advisory",
       "winter storm warning",
-      "blizzard warning"
+      "blizzard warning",
+"Winter Storm Watch"
     ])
   };
 
@@ -92,7 +93,7 @@ function App() {
     severeWatches: "Counts Tornado Watch and Severe Thunderstorm Watch alerts from NWS Peachtree City.",
     floodWarnings: "Includes Flood Warnings, Flash Flood Warnings, and related advisories.",
     heatWarnings: "Includes Heat Advisories and Excessive Heat Warnings.",
-    coldWeather: "Includes Freeze Watches/Warnings, Frost Advisories, Cold Weather Advisories, Winter Storm Warnings, and Blizzard Warnings."
+    coldWeather: "Includes Freeze Watches/Warnings, Frost Advisories, Cold Weather Advisories, Winter Storm Warnings/Watches, and Blizzard Warnings."
   };
 
   const handleBannerClick = (type) => {
