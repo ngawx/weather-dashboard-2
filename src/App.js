@@ -61,9 +61,7 @@ function App() {
   });
 
   const ffcActiveAlertCount = filteredAlerts.length;
-  {ffcActiveAlertCount === 0 && (
-  <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
-)}
+)};
 
   const countByType = (typeKeywords) =>
     alerts.filter((alert) => {
@@ -161,6 +159,9 @@ function App() {
         <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-4">
           Active Alerts: {ffcActiveAlertCount}
         </div>
+          {ffcActiveAlertCount === 0 && (
+  <div className="text-sm text-gray-400 mb-4">No Active Alerts</div>
+)}
       </div>
 
       <footer className="absolute bottom-2 left-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
