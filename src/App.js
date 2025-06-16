@@ -151,7 +151,7 @@ function App() {
           <div onClick={() => handleBannerClick("coldWeather")} className="bg-blue-600 px-2 py-1 rounded cursor-pointer hover:underline">Cold Weather Alerts: {counts.coldWeather}</div>
         </div>
 
-        <div className="absolute bottom-4 right-4 z-50 max-w-md w-full">
+        <div className="w-full flex justify-center mb-6">
           <ConditionsScroll />
         </div>
 
