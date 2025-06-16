@@ -1,4 +1,3 @@
-// src/components/ConditionsScroll.js
 import React, { useEffect, useState } from 'react';
 import './ConditionsScroll.css';
 
@@ -19,27 +18,34 @@ export default function ConditionsScroll() {
     const fetchAll = async () => {
       const results = await Promise.all(
         cities.map(async (city) => {
-          const res = await fetch(`https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`);
+          const res = await fetch(
+            `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
+          );
           const json = await res.json();
           const current = json.properties.periods[0];
           const next = json.properties.periods.slice(1, 4);
           return {
             city: city.name,
             current,
-            forecast: next
+            forecast: next,
           };
         })
       );
       setData(results);
     };
+
     fetchAll();
+
     const interval = setInterval(() => {
       setIndex((i) => (i + 1) % cities.length);
     }, 8000);
+
     return () => clearInterval(interval);
   }, []);
 
-  if (data.length === 0) return <div className="conditions-box">Loading...</div>;
+  if (data.length === 0) {
+    return <div className="conditions-box">Loading...</div>;
+  }
 
   const item = data[index];
 
@@ -51,7 +57,10 @@ export default function ConditionsScroll() {
         <div className="forecast-row">
           {item.forecast.map((f, idx) => (
             <div className="forecast-hour" key={idx}>
-              <div className="hour">{new Date(f.startTime).getHours() % 12 || 12}{new Date(f.startTime).getHours() >= 12 ? 'PM' : 'AM'}</div>
+              <div className="hour">
+                {new Date(f.startTime).getHours() % 12 || 12}
+                {new Date(f.startTime).getHours() >= 12 ? 'PM' : 'AM'}
+              </div>
               <div>{f.shortForecast}</div>
               <div>{f.temperature}°</div>
             </div>
