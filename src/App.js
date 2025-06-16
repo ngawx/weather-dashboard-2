@@ -155,12 +155,11 @@ function App() {
           <ConditionsScroll />
         </div>
 
-        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-2">
+        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-4">
           Active Alerts: {ffcActiveAlertCount}
         </div>
-
         {ffcActiveAlertCount === 0 && (
-          <div className="text-sm text-gray-400 mb-4">No Active Alerts</div>
+          <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
         )}
       </div>
 
