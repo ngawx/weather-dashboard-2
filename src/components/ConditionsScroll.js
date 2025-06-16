@@ -15,7 +15,8 @@ export default function ConditionsScroll() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log("Fetching Weather Data...);
+console.log("⏳ ConditionsScroll component is mounted");    
+console.log("Fetching Weather Data...);
     const fetchAll = async () => {
       const results = await Promise.all(
         cities.map(async (city) => {
