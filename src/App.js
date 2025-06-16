@@ -109,7 +109,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
-        <div className="flex justify-center gap-2 mb-2">
+        <div className="flex flex-wrap justify-center gap-2 mb-2">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
           <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
           <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
@@ -137,7 +137,7 @@ function App() {
         )}
       </div>
 
-      <div className="w-full lg:w-1/2 flex flex-col items-center">
+      <div className="w-full lg:w-1/2 flex flex-col items-center px-2 sm:px-4">
         <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
@@ -151,15 +151,15 @@ function App() {
           <div onClick={() => handleBannerClick("coldWeather")} className="bg-blue-600 px-2 py-1 rounded cursor-pointer hover:underline">Cold Weather Alerts: {counts.coldWeather}</div>
         </div>
 
-        <div className="w-full flex justify-center mb-6">
+        <div className="w-full flex justify-center mb-6 px-2 sm:px-0">
           <ConditionsScroll />
         </div>
 
-        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-4">
+        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-2 text-center">
           Active Alerts: {ffcActiveAlertCount}
         </div>
         {ffcActiveAlertCount === 0 && (
-          <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
+          <div className="text-sm text-gray-400 mb-4 text-center">No Active Alerts</div>
         )}
       </div>
 
