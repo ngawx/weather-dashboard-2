@@ -15,25 +15,30 @@ export default function ConditionsScroll() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-console.log("⏳ ConditionsScroll component is mounted");    
-console.log("Fetching Weather Data...);
+    console.log("⏳ ConditionsScroll component is mounted");
+    console.log("Fetching Weather Data...");
+
     const fetchAll = async () => {
-      const results = await Promise.all(
-        cities.map(async (city) => {
-          const res = await fetch(
-            `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
-          );
-          const json = await res.json();
-          const current = json.properties.periods[0];
-          const next = json.properties.periods.slice(1, 4);
-          return {
-            city: city.name,
-            current,
-            forecast: next,
-          };
-        })
-      );
-      setData(results);
+      try {
+        const results = await Promise.all(
+          cities.map(async (city) => {
+            const res = await fetch(
+              `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
+            );
+            const json = await res.json();
+            const current = json.properties.periods[0];
+            const next = json.properties.periods.slice(1, 4);
+            return {
+              city: city.name,
+              current,
+              forecast: next,
+            };
+          })
+        );
+        setData(results);
+      } catch (error) {
+        console.error("Error fetching weather data:", error);
+      }
     };
 
     fetchAll();
@@ -46,25 +51,24 @@ console.log("Fetching Weather Data...);
   }, []);
 
   if (data.length === 0) {
-    return <div className="conditions-box">Loading...</div>;
+    return <div className="scroll-box">Loading current conditions...</div>;
   }
 
-  const item = data[index];
+  const cityData = data[index];
 
   return (
-    <div className="conditions-container">
-      <div className="conditions-box">
-        <div className="location">{item.city}</div>
-        <div className="current">Currently: {item.current.shortForecast}, {item.current.temperature}°F</div>
-        <div className="forecast-row">
-          {item.forecast.map((f, idx) => (
-            <div className="forecast-hour" key={idx}>
-              <div className="hour">
-                {new Date(f.startTime).getHours() % 12 || 12}
-                {new Date(f.startTime).getHours() >= 12 ? 'PM' : 'AM'}
-              </div>
-              <div>{f.shortForecast}</div>
-              <div>{f.temperature}°</div>
+    <div className="scroll-box">
+      <div className="scroll-entry">
+        <div className="city-name">Currently: {cityData.city}</div>
+        <div className="current">
+          {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
+        </div>
+        <div className="forecast">
+          {cityData.forecast.map((period, idx) => (
+            <div key={idx} className="forecast-hour">
+              <div>{period.name}</div>
+              <div>{period.temperature}°{period.temperatureUnit}</div>
+              <div>{period.shortForecast}</div>
             </div>
           ))}
         </div>
