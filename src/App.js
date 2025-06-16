@@ -61,6 +61,9 @@ function App() {
   });
 
   const ffcActiveAlertCount = filteredAlerts.length;
+  {ffcActiveAlertCount === 0 && (
+  <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
+)}
 
   const countByType = (typeKeywords) =>
     alerts.filter((alert) => {
