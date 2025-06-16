@@ -106,36 +106,6 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "Unknown";
-    return new Date(timeString).toLocaleString("en-US", { timeZoneName: "short" });
-  };
-
-  const getAlertStyles = (event) => {
-    const colors = {
-      "Tornado Warning": "bg-red-700 border-red-900 animate-pulse",
-      "Tornado Watch": "bg-orange-600 border-orange-800",
-      "Severe Thunderstorm Warning": "bg-orange-500 border-orange-700 animate-pulse",
-      "Severe Thunderstorm Watch": "bg-yellow-500 border-yellow-700",
-      "Flood Warning": "bg-green-600 border-green-800",
-      "Flash Flood Warning": "bg-green-800 border-green-900",
-      "Winter Storm Warning": "bg-blue-500 border-blue-700",
-      "Blizzard Warning": "bg-purple-700 border-purple-900",
-      "High Wind Warning": "bg-yellow-600 border-yellow-800",
-      "Wind Advisory": "bg-gray-500 border-gray-700",
-      "Heat Advisory": "bg-orange-400 border-orange-600",
-      "Excessive Heat Warning": "bg-red-800 border-red-900",
-      "Freeze Warning": "bg-blue-600 border-blue-800",
-      "Frost Advisory": "bg-blue-300 border-blue-500",
-      "Dense Fog Advisory": "bg-gray-700 border-gray-900",
-      "Special Weather Statement": "bg-indigo-500 border-indigo-700",
-      "Flood Watch": "bg-green-500 border-green-700"
-    };
-    return colors[event] || "bg-gray-800 border-gray-600";
-  };
-
-  const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
-
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
