@@ -1,0 +1,43 @@
+.conditions-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 12px;
+  z-index: 9999;
+}
+
+.conditions-box {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 16px;
+  border-radius: 10px;
+  color: white;
+  font-family: 'Oswald', sans-serif;
+  width: 330px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.location {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.current {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.forecast-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.forecast-hour {
+  background: rgba(255,255,255,0.1);
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  flex: 1;
+}
