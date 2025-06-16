@@ -138,7 +138,7 @@ function App() {
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-col items-center">
-        <div className="absolute top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+        <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
