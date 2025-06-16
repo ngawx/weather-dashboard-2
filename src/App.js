@@ -138,8 +138,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
-
-      {/* Map Selection */}
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
         <div className="flex justify-center gap-2 mb-2">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
@@ -153,9 +151,22 @@ function App() {
             ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
             : "https://www.spc.noaa.gov/products/activity_loop.gif"
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
+        {selectedMap === "spc" && (
+          <div className="mt-2 text-xs text-gray-300 px-2">
+            <p><strong>SPC Activity Map Legend:</strong></p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              <span><span className="text-green-300">Green</span>: General T-storms</span>
+              <span><span className="text-yellow-300">Yellow</span>: Slight Risk</span>
+              <span><span className="text-orange-300">Orange</span>: Enhanced Risk</span>
+              <span><span className="text-red-400">Red</span>: Moderate Risk</span>
+              <span><span className="text-pink-400">Magenta</span>: High Risk</span>
+              <span><span className="text-blue-300">Blue Box</span>: SVR T-storm Watch</span>
+              <span><span className="text-red-300">Red Box</span>: Tornado Watch</span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Alert Counter */}
       <div className="w-full lg:w-1/2 flex flex-col items-center">
         <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} {timeSuffix}
@@ -170,16 +181,16 @@ function App() {
           <div onClick={() => handleBannerClick("coldWeather")} className="bg-blue-600 px-2 py-1 rounded cursor-pointer hover:underline">Cold Weather Alerts: {counts.coldWeather}</div>
         </div>
 
-        {/* Active Alert Scroll Component */}
         <div className="fixed bottom-4 right-4 z-50 max-w-md w-full">
           <ConditionsScroll />
         </div>
 
-        {/* Active Alert Count */}
         <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-4">
           Active Alerts: {ffcActiveAlertCount}
         </div>
       </div>
+
+      <footer className="absolute bottom-2 left-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
 
       <style>{`
         @keyframes marquee {
