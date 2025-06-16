@@ -60,7 +60,7 @@ export default function ConditionsScroll() {
     <div className="scroll-box fancy-gradient">
       <div className="scroll-entry white-outline">
         <div className="city-name text-xl font-semibold text-center mb-2">{cityData.city}</div>
-        <div className="current-condition-box text-center text-lg font-medium bg-white text-gray-800 p-2 mb-4 rounded shadow">
+        <div className="current-condition-box text-center text-lg font-medium bg-blue-800 text-white p-2 mb-4 rounded shadow">
           {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
         </div>
         <div className="forecast flex justify-between gap-2">
@@ -69,6 +69,7 @@ export default function ConditionsScroll() {
               <div className="font-bold text-white mb-1">{period.name}</div>
               <div className="text-white">{period.temperature}°{period.temperatureUnit}</div>
               <div className="text-white text-xs mt-1">{period.shortForecast}</div>
+              <div className="text-white text-[10px] mt-1">{new Date(period.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
           ))}
         </div>
