@@ -35,10 +35,33 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+      if (autoScroll && filteredAlerts.length > alertsPerPage) {
+        setCurrentIndex((prev) => (prev + alertsPerPage) % filteredAlerts.length);
+      }
+    }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [filteredAlerts, autoScroll]);
+
+  const resumeAutoScroll = () => {
+    clearTimeout(resumeTimeout.current);
+    resumeTimeout.current = setTimeout(() => {
+      setAutoScroll(true);
+    }, 15000);
+  };
+
+  const handleNext = () => {
+    setAutoScroll(false);
+    setCurrentIndex((prev) => (prev + alertsPerPage) % filteredAlerts.length);
+    resumeAutoScroll();
+  };
+
+  const handlePrev = () => {
+    setAutoScroll(false);
+    setCurrentIndex((prev) =>
+      (prev - alertsPerPage + filteredAlerts.length) % filteredAlerts.length
+    );
+    resumeAutoScroll();
+  };
 
   const allAlertTypes = Array.from(new Set(alerts.map(alert => alert.properties.event))).sort();
 
@@ -62,50 +85,6 @@ function App() {
 
   const ffcActiveAlertCount = filteredAlerts.length;
 
-  const countByType = (typeKeywords) =>
-    alerts.filter((alert) => {
-      const { senderName, event } = alert.properties;
-      return (
-        senderName?.toLowerCase().includes("nws peachtree city") &&
-        typeKeywords.some((kw) => event.toLowerCase().includes(kw))
-      );
-    }).length;
-
-  const counts = {
-    tornadoWarnings: countByType(["tornado warning"]),
-    severeThunderstormWarnings: countByType(["severe thunderstorm warning"]),
-    severeWatches: countByType(["tornado watch", "severe thunderstorm watch"]),
-    floodWarnings: countByType(["flood warning", "flash flood warning", "flood advisory", "flash flood advisory"]),
-    heatWarnings: countByType(["heat advisory", "excessive heat warning"]),
-    coldWeather: countByType([
-      "freeze watch",
-      "freeze warning",
-      "frost advisory",
-      "cold weather advisory",
-      "cold weather warning",
-      "winter weather advisory",
-      "winter storm warning",
-      "blizzard warning",
-      "Winter Storm Watch"
-    ])
-  };
-
-  const alertInfo = {
-    severeWatches: "Counts Tornado Watch and Severe Thunderstorm Watch alerts from NWS Peachtree City.",
-    floodWarnings: "Includes Flood Warnings, Flash Flood Warnings, and related advisories.",
-    heatWarnings: "Includes Heat Advisories and Excessive Heat Warnings.",
-    coldWeather: "Includes Freeze Watches/Warnings, Frost Advisories, Cold Weather Advisories, Winter Storm Warnings/Watches, and Blizzard Warnings."
-  };
-
-  const handleBannerClick = (type) => {
-    if (alertInfo[type]) {
-      alert(alertInfo[type]);
-    }
-  };
-
-  const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
-  const timeSuffix = isDaylightSaving ? "EDT" : "EST";
-
   const getAlertColor = (event) => {
     const lower = event.toLowerCase();
     if (lower.includes("tornado")) return "bg-red-700";
@@ -114,6 +93,9 @@ function App() {
     if (lower.includes("flood")) return "bg-green-700";
     return "bg-gray-600";
   };
+
+  const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
+  const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
@@ -137,42 +119,44 @@ function App() {
           {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mt-4 mb-6 text-xs font-semibold w-full text-center">
-          <div className="bg-red-700 px-2 py-1 rounded">Tornado Warnings: {counts.tornadoWarnings}</div>
-          <div className="bg-orange-500 px-2 py-1 rounded">Severe T-Storm Warnings: {counts.severeThunderstormWarnings}</div>
-          <div onClick={() => handleBannerClick("severeWatches")} className="bg-yellow-500 px-2 py-1 rounded cursor-pointer hover:underline">Severe Watches: {counts.severeWatches}</div>
-          <div onClick={() => handleBannerClick("floodWarnings")} className="bg-green-600 px-2 py-1 rounded cursor-pointer hover:underline">Flood Alerts: {counts.floodWarnings}</div>
-          <div onClick={() => handleBannerClick("heatWarnings")} className="bg-orange-400 px-2 py-1 rounded cursor-pointer hover:underline">Heat Alerts: {counts.heatWarnings}</div>
-          <div onClick={() => handleBannerClick("coldWeather")} className="bg-blue-600 px-2 py-1 rounded cursor-pointer hover:underline">Cold Weather Alerts: {counts.coldWeather}</div>
-        </div>
-
-        <div className="w-full flex justify-center mb-6">
-          <ConditionsScroll />
-        </div>
-
-        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mb-4">
+        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
           Active Alerts: {ffcActiveAlertCount}
         </div>
-
         {ffcActiveAlertCount === 0 && (
           <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4">
-          {filteredAlerts.slice(0, 8).map((alert, idx) => {
-            const { event, effective, expires, areaDesc } = alert.properties;
-            const colorClass = getAlertColor(event);
-            return (
-              <div key={idx} className={`p-4 rounded shadow ${colorClass}`}>
-                <h3 className="text-lg font-bold mb-2">{event}</h3>
-                <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-                <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                <div className="text-xs mt-2 overflow-y-auto max-h-24 whitespace-pre-line">
-                  <strong>Affected Areas:</strong> {areaDesc}
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex justify-between items-center w-full px-4 mb-2">
+          <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
+          <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
+          <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-4 min-h-[400px]">
+          <AnimatePresence mode="wait">
+            {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
+              const { event, effective, expires, areaDesc } = alert.properties;
+              const colorClass = getAlertColor(event);
+              return (
+                <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px]`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}>
+                  <h3 className="text-lg font-bold mb-2">{event}</h3>
+                  <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                  <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                  <div className="text-xs mt-2 overflow-y-auto max-h-24 whitespace-pre-line">
+                    <strong>Affected Areas:</strong> {areaDesc}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        <div className="w-full flex justify-center mb-6 min-h-[160px]">
+          <ConditionsScroll />
         </div>
       </div>
 
