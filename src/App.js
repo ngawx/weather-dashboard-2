@@ -94,8 +94,10 @@ function App() {
     return "bg-gray-600";
   };
 
-  const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
-  const timeSuffix = isDaylightSaving ? "EDT" : "EST";
+  const getTimeSuffix = (date) => {
+    return date.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT") ? "EDT" : "EST";
+  };
+  const timeSuffix = getTimeSuffix(currentTime);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
@@ -128,7 +130,7 @@ function App() {
 
         <div className="flex justify-between items-center w-full px-4 mb-2">
           <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
-          <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
+          <span className="text-xs text-gray-400" title="Auto-scroll resumes 15 seconds after navigation">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
           <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
         </div>
 
