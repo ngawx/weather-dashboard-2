@@ -106,6 +106,15 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
+  const getAlertColor = (event) => {
+    const lower = event.toLowerCase();
+    if (lower.includes("tornado")) return "bg-red-700";
+    if (lower.includes("severe")) return "bg-orange-500";
+    if (lower.includes("watch")) return "bg-yellow-500";
+    if (lower.includes("flood")) return "bg-green-700";
+    return "bg-gray-600";
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
@@ -121,20 +130,6 @@ function App() {
             ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
             : "https://www.spc.noaa.gov/products/activity_loop.gif"
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
-        {selectedMap === "spc" && (
-          <div className="mt-2 text-xs text-gray-300 px-2">
-            <p><strong>SPC Activity Map Legend:</strong></p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <span><span className="text-green-300">Green</span>: General T-storms</span>
-              <span><span className="text-yellow-300">Yellow</span>: Slight Risk</span>
-              <span><span className="text-orange-300">Orange</span>: Enhanced Risk</span>
-              <span><span className="text-red-400">Red</span>: Moderate Risk</span>
-              <span><span className="text-pink-400">Magenta</span>: High Risk</span>
-              <span><span className="text-blue-300">Blue Box</span>: SVR T-storm Watch</span>
-              <span><span className="text-red-300">Red Box</span>: Tornado Watch</span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-col items-center">
@@ -162,21 +157,26 @@ function App() {
         {ffcActiveAlertCount === 0 && (
           <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
         )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4">
+          {filteredAlerts.slice(0, 8).map((alert, idx) => {
+            const { event, effective, expires, areaDesc } = alert.properties;
+            const colorClass = getAlertColor(event);
+            return (
+              <div key={idx} className={`p-4 rounded shadow ${colorClass}`}>
+                <h3 className="text-lg font-bold mb-2">{event}</h3>
+                <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                <div className="text-xs mt-2 overflow-y-auto max-h-24 whitespace-pre-line">
+                  <strong>Affected Areas:</strong> {areaDesc}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <footer className="absolute bottom-2 left-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
-
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-          display: inline-block;
-          white-space: nowrap;
-          animation: marquee 20s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
