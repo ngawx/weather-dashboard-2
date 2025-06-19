@@ -12,6 +12,13 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
+    useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  
   useEffect(() => {
     const loadAlerts = async () => {
       try {
@@ -164,7 +171,7 @@ function App() {
                 const { event, effective, expires, areaDesc } = alert.properties;
                 const colorClass = getAlertColor(event);
                 return (
-                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px]`}
+                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[120px]`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
