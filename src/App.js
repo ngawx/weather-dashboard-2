@@ -44,6 +44,7 @@ function App() {
   const alertCounts = {
     tornado: 0,
     severe: 0,
+    severeWarn: 0,
     flood: 0,
     heat: 0,
     cold: 0
@@ -52,6 +53,7 @@ function App() {
   filteredAlerts.forEach(alert => {
     const event = alert.properties.event.toLowerCase();
     if (event.includes("tornado")) alertCounts.tornado++;
+    if (event.includes("severe") && event.includes("warning")) alertCounts.severeWarn++;
     if (event.includes("severe")) alertCounts.severe++;
     if (event.includes("flood")) alertCounts.flood++;
     if (event.includes("heat")) alertCounts.heat++;
@@ -135,11 +137,12 @@ function App() {
           </div>
 
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
-            <div className="text-white">Tornado: {alertCounts.tornado}</div>
-            <div className="text-white">Severe: {alertCounts.severe}</div>
-            <div className="text-white cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
-            <div className="text-white cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
-            <div className="text-white cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
+            <div className="px-2 py-1 rounded text-white bg-red-700">Tornado: {alertCounts.tornado}</div>
+            <div className="px-2 py-1 rounded text-white bg-orange-600">Severe: {alertCounts.severe}</div>
+            <div className="px-2 py-1 rounded text-white bg-orange-800">Severe Warnings: {alertCounts.severeWarn}</div>
+            <div className="px-2 py-1 rounded text-white bg-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
+            <div className="px-2 py-1 rounded text-white bg-yellow-600 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
+            <div className="px-2 py-1 rounded text-white bg-blue-800 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
           </div>
 
           <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
