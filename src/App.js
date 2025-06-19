@@ -81,11 +81,6 @@ function App() {
     );
   };
 
-  const filteredAlerts = alerts.filter((alert) => {
-    const { event, senderName, effective, expires } = alert.properties;
-    const isFromFFC = senderName?.toLowerCase().includes("nws peachtree city");
-  });
-
   const ffcActiveAlertCount = filteredAlerts.length;
 
   const getAlertColor = (event) => {
