@@ -8,6 +8,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [selectedMap, setSelectedMap] = useState("radar");
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
@@ -90,9 +91,23 @@ function App() {
     }`}>
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
         <div className="flex justify-center gap-2 mb-2">
-          <button className="px-3 py-1 rounded text-sm bg-blue-600">Current Radar</button>
+          <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+          <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+          <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
         </div>
-        <img src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`} alt="Radar" className="w-full h-auto object-contain rounded" />
+        <img src={
+          selectedMap === "radar"
+            ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
+            : selectedMap === "alerts"
+            ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
+            : "https://www.spc.noaa.gov/products/activity_loop.gif"
+        } alt="Map Display" className="w-full h-auto object-contain rounded" />
+
+        {selectedMap === "spc" && (
+          <div className="text-xs mt-2 text-center">
+            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm. <span className="text-green-700 font-bold">Dark Green</span> – Marginal. <span className="text-yellow-400 font-bold">Yellow</span> – Slight. <span className="text-orange-500 font-bold">Orange</span> – Enhanced. <span className="text-red-500 font-bold">Red</span> – Moderate. <span className="text-pink-400 font-bold">Magenta</span> – High.
+          </div>
+        )}
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-row">
