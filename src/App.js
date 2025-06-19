@@ -136,63 +136,64 @@ function App() {
         )}
       </div>
 
-      <div className="w-full lg:w-1/2 flex flex-col items-center">
-        <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
-          {currentTime.toLocaleTimeString()} {timeSuffix}
-        </div>
+      <div className="w-full lg:w-1/2 flex flex-row items-start">
+        <div className="flex-1 flex flex-col items-center">
+          <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+            {currentTime.toLocaleTimeString()} {timeSuffix}
+          </div>
 
-        <div className="flex gap-2 flex-wrap justify-center text-xs text-white mt-4">
-          <div className="bg-red-700 px-2 py-1 rounded">Tornado: {alertCounts.tornado}</div>
-          <div className="bg-orange-500 px-2 py-1 rounded">Severe: {alertCounts.severe}</div>
-          <div className="bg-yellow-500 px-2 py-1 rounded">Watches: {alertCounts.watch}</div>
-          <div className="bg-green-700 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('flood')}>Flood: {alertCounts.flood}</div>
-          {showDefinitions.flood && <div className="text-xs text-gray-300">Flash Flood Warnings, Flood Warnings, Areal Flood Watches, etc.</div>}
-          <div className="bg-pink-600 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('heat')}>Heat: {alertCounts.heat}</div>
-          {showDefinitions.heat && <div className="text-xs text-gray-300">Excessive Heat Warnings, Heat Advisories, etc.</div>}
-          <div className="bg-blue-500 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('cold')}>Cold: {alertCounts.cold}</div>
-          {showDefinitions.cold && <div className="text-xs text-gray-300">Winter Storm Warnings, Freeze Watches, Cold Advisories, etc.</div>}
-        </div>
+          <div className="flex gap-2 flex-wrap justify-center text-xs text-white mt-4">
+            <div className="bg-red-700 px-2 py-1 rounded">Tornado: {alertCounts.tornado}</div>
+            <div className="bg-orange-500 px-2 py-1 rounded">Severe: {alertCounts.severe}</div>
+            <div className="bg-yellow-500 px-2 py-1 rounded">Watches: {alertCounts.watch}</div>
+            <div className="bg-green-700 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('flood')}>Flood: {alertCounts.flood}</div>
+            {showDefinitions.flood && <div className="text-xs text-gray-300">Flash Flood Warnings, Flood Warnings, Areal Flood Watches, etc.</div>}
+            <div className="bg-pink-600 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('heat')}>Heat: {alertCounts.heat}</div>
+            {showDefinitions.heat && <div className="text-xs text-gray-300">Excessive Heat Warnings, Heat Advisories, etc.</div>}
+            <div className="bg-blue-500 px-2 py-1 rounded cursor-pointer" onClick={() => toggleDefinition('cold')}>Cold: {alertCounts.cold}</div>
+            {showDefinitions.cold && <div className="text-xs text-gray-300">Winter Storm Warnings, Freeze Watches, Cold Advisories, etc.</div>}
+          </div>
 
-        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
-          Active Alerts: {ffcActiveAlertCount}
-        </div>
-        {ffcActiveAlertCount === 0 && (
-          <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
-        )}
+          <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
+            Active Alerts: {ffcActiveAlertCount}
+          </div>
+          {ffcActiveAlertCount === 0 && (
+            <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
+          )}
 
-        <div className="flex justify-between items-center w-full px-4 mb-2 mt-2">
-          <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
-          <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
-          <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
-        </div>
+          <div className="flex justify-between items-center w-full px-4 mb-2 mt-2">
+            <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
+            <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
+            <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-2 min-h-[400px]">
-          <AnimatePresence mode="wait">
-            {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
-              const { event, effective, expires, areaDesc } = alert.properties;
-              const colorClass = getAlertColor(event);
-              return (
-                <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px] flex flex-col justify-between`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}>
-                  <div>
-                    <h3 className="text-lg font-bold mb-2">{event}</h3>
-                    <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-                    <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                  </div>
-                  <div className="text-xs mt-2 overflow-hidden whitespace-nowrap animate-marquee">
-                    <strong>Affected Areas:</strong> {areaDesc}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+          <div className="grid grid-cols-1 gap-4 w-full px-4 mb-2 min-h-[400px]">
+            <AnimatePresence mode="wait">
+              {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
+                const { event, effective, expires, areaDesc } = alert.properties;
+                const colorClass = getAlertColor(event);
+                return (
+                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px] flex flex-col justify-between`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}>
+                    <div>
+                      <h3 className="text-lg font-bold mb-2">{event}</h3>
+                      <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                      <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                    </div>
+                    <div className="text-xs mt-2 overflow-hidden whitespace-nowrap animate-marquee">
+                      <strong>Affected Areas:</strong> {areaDesc}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </div>
-
-        <div className="w-full flex justify-center mt-1 mb-4 min-h-[160px]">
-          <ConditionsScroll />
+        <div className="w-[180px] min-h-[400px] flex items-start justify-center">
+          <ConditionsScroll vertical />
         </div>
       </div>
 
