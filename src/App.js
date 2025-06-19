@@ -33,9 +33,7 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const filteredAlerts = alerts.filter((alert) => {
-    const { event, senderName, effective, expires } = alert.properties;
-    const isFromFFC = senderName?.toLowerCase().includes("nws peachtree city");
+  
     const matchesType = selectedAlertTypes.length === 0 || selectedAlertTypes.includes(event);
     const now = new Date();
     const effectiveTime = new Date(effective);
