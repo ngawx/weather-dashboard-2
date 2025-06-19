@@ -12,13 +12,13 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
-    useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-  
+
   useEffect(() => {
     const loadAlerts = async () => {
       try {
@@ -117,7 +117,7 @@ function App() {
     }`}>
 
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
-        <div className="flex justify-center gap-2 mb-2">
+        <div className="flex justify-center gap-2 mb-2 flex-wrap">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
           <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
           <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
@@ -132,12 +132,12 @@ function App() {
 
         {selectedMap === "spc" && (
           <div className="text-xs mt-2 text-center">
-            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm. <span className="text-green-700 font-bold">Dark Green</span> – Marginal. <span className="text-yellow-400 font-bold">Yellow</span> – Slight. <span className="text-orange-500 font-bold">Orange</span> – Enhanced. <span className="text-red-500 font-bold">Red</span> – Moderate. <span className="text-pink-400 font-bold">Magenta</span> – High.
+            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm <span className="text-green-700 font-bold">Dark Green</span> – Marginal <span className="text-yellow-400 font-bold">Yellow</span> – Slight <span className="text-orange-500 font-bold">Orange</span> – Enhanced <span className="text-red-500 font-bold">Red</span> – Moderate <span className="text-pink-400 font-bold">Magenta</span> – High
           </div>
         )}
       </div>
 
-      <div className="w-full lg:w-1/2 flex flex-row">
+      <div className="w-full lg:w-1/2 flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col items-center">
           <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
             {currentTime.toLocaleTimeString()} {timeSuffix}
@@ -145,10 +145,10 @@ function App() {
 
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-red-700">Tornado: {alertCounts.tornado}</div>
-            <div className="px-2 py-1 rounded text-white bg-orange-800">Svr T-Storm: {alertCounts.severeWarn}</div>
-            <div className="px-2 py-1 rounded text-white bg-orange-600">Severe: {alertCounts.severe}</div>
+            <div className="px-2 py-1 rounded text-white bg-orange-600">Svr T-Storm: {alertCounts.severeWarn}</div>
+            <div className="px-2 py-1 rounded text-white bg-yellow-500">Severe: {alertCounts.severe}</div>
             <div className="px-2 py-1 rounded text-white bg-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
-            <div className="px-2 py-1 rounded text-white bg-yellow-600 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
+            <div className="px-2 py-1 rounded text-white bg-red-400 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
             <div className="px-2 py-1 rounded text-white bg-blue-800 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
           </div>
 
@@ -189,7 +189,7 @@ function App() {
           </div>
         </div>
 
-        <div className="flex flex-col w-[250px] px-2 overflow-y-auto h-[600px] mt-8">
+        <div className="flex flex-col w-full md:w-[250px] px-2 overflow-y-auto h-[600px] mt-8">
           <ConditionsScroll />
         </div>
       </div>
