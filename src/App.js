@@ -193,7 +193,7 @@ function App() {
           </div>
         </div>
         <div className="w-[180px] min-h-[400px] flex flex-col space-y-4 items-center justify-start px-2">
-          <ConditionsScroll vertical stacked />
+          <ConditionsScroll vertical stacked boxDirection="vertical" />
         </div>
       </div>
 
