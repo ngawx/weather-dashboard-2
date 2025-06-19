@@ -31,9 +31,11 @@ export default function ConditionsScroll() {
             const json = await res.json();
             const current = json.properties.periods[0];
 
-            const next = json.properties.periods
-              .filter(p => new Date(p.startTime).getHours() >= startHour)
-              .slice(0, 3);
+            const now = new Date();
+const currentMinute = now.getMinutes();
+const offset = currentMinute < 30 ? 1 : 2;
+const next = json.properties.periods.slice(offset, offset + 3);
+
 
             return {
               city: city.name,
