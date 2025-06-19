@@ -41,6 +41,23 @@ function App() {
     /tornado|severe thunderstorm|watch/i.test(alert.properties.event)
   );
 
+  const alertCounts = {
+    tornado: 0,
+    severe: 0,
+    flood: 0,
+    heat: 0,
+    cold: 0
+  };
+
+  filteredAlerts.forEach(alert => {
+    const event = alert.properties.event.toLowerCase();
+    if (event.includes("tornado")) alertCounts.tornado++;
+    if (event.includes("severe")) alertCounts.severe++;
+    if (event.includes("flood")) alertCounts.flood++;
+    if (event.includes("heat")) alertCounts.heat++;
+    if (event.includes("cold") || event.includes("blizzard") || event.includes("freeze")) alertCounts.cold++;
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (autoScroll && filteredAlerts.length > alertsPerPage) {
@@ -89,7 +106,15 @@ function App() {
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
       hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
     }`}>
-      <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
+      <div className="fixed top-0 w-full flex flex-wrap justify-center gap-2 bg-black bg-opacity-50 py-1 z-50 text-sm">
+        <div className="px-2 py-1 rounded bg-red-700 text-white">Tornado: {alertCounts.tornado}</div>
+        <div className="px-2 py-1 rounded bg-orange-500 text-white">Severe: {alertCounts.severe}</div>
+        <div className="px-2 py-1 rounded bg-green-700 text-white cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
+        <div className="px-2 py-1 rounded bg-yellow-300 text-black cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
+        <div className="px-2 py-1 rounded bg-blue-400 text-black cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
+      </div>
+
+      <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
         <div className="flex justify-center gap-2 mb-2">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
           <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
@@ -112,7 +137,7 @@ function App() {
 
       <div className="w-full lg:w-1/2 flex flex-row">
         <div className="flex-1 flex flex-col items-center">
-          <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+          <div className="fixed top-10 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
             {currentTime.toLocaleTimeString()} {timeSuffix}
           </div>
 
