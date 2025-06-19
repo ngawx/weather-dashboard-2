@@ -69,9 +69,12 @@ const next = json.properties.periods.slice(offset, offset + 3);
     <div className="scroll-box fancy-gradient w-full">
       <div className="scroll-entry white-outline w-full">
         <div className="city-name text-xl font-semibold text-center mb-2">{cityData.city}</div>
-        <div className="current-condition-box text-center text-lg font-medium bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
-          {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
-        </div>
+        <div className="current-condition-box text-center bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
+  <div className="text-xs italic mb-1">Currently</div>
+  <div className="text-lg font-medium">
+    {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
+  </div>
+</div>
         <div className="flex flex-col gap-2 w-full">
           {cityData.forecast.map((period, idx) => (
             <div
