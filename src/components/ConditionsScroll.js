@@ -71,7 +71,7 @@ const next = json.properties.periods.slice(offset, offset + 3);
         <div className="city-name text-xl font-semibold text-center mb-2">{cityData.city}</div>
         <div className="current-condition-box text-center bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
   <div className="text-xs italic mb-1">Currently</div>
-  <div className="text-lg font-medium">
+  <div className="text-base font-medium">
     {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
   </div>
 </div>
