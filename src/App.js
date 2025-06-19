@@ -130,16 +130,16 @@ function App() {
 
       <div className="w-full lg:w-1/2 flex flex-row">
         <div className="flex-1 flex flex-col items-center">
-          <div className="fixed top-10 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
+          <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
             {currentTime.toLocaleTimeString()} {timeSuffix}
           </div>
 
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
-            <div className="px-2 py-1 rounded bg-red-700 text-white">Tornado: {alertCounts.tornado}</div>
-            <div className="px-2 py-1 rounded bg-orange-500 text-white">Severe: {alertCounts.severe}</div>
-            <div className="px-2 py-1 rounded bg-green-700 text-white cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
-            <div className="px-2 py-1 rounded bg-yellow-300 text-black cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
-            <div className="px-2 py-1 rounded bg-blue-400 text-black cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
+            <div className="text-white">Tornado: {alertCounts.tornado}</div>
+            <div className="text-white">Severe: {alertCounts.severe}</div>
+            <div className="text-white cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
+            <div className="text-white cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
+            <div className="text-white cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
           </div>
 
           <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
@@ -155,7 +155,7 @@ function App() {
             <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-4 min-h-[400px]">
+          <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
               {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
                 const { event, effective, expires, areaDesc } = alert.properties;
