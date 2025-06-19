@@ -20,6 +20,9 @@ export default function ConditionsScroll() {
 
     const fetchAll = async () => {
       try {
+        const now = new Date();
+        const startHour = now.getMinutes() >= 30 ? now.getHours() + 1 : now.getHours();
+
         const results = await Promise.all(
           cities.map(async (city) => {
             const res = await fetch(
@@ -27,7 +30,11 @@ export default function ConditionsScroll() {
             );
             const json = await res.json();
             const current = json.properties.periods[0];
-            const next = json.properties.periods.slice(1, 4);
+
+            const next = json.properties.periods
+              .filter(p => new Date(p.startTime).getHours() >= startHour)
+              .slice(0, 3);
+
             return {
               city: city.name,
               current,
@@ -75,6 +82,9 @@ export default function ConditionsScroll() {
               <div className="font-semibold text-white mb-1">{period.name}</div>
               <div className="text-white">{period.temperature}°{period.temperatureUnit}</div>
               <div className="text-white text-xs mt-1">{period.shortForecast}</div>
+              {period.probabilityOfPrecipitation && period.probabilityOfPrecipitation.value !== null && (
+                <div className="text-white text-xs mt-1">Precip: {period.probabilityOfPrecipitation.value}%</div>
+              )}
             </div>
           ))}
         </div>
