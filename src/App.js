@@ -138,8 +138,8 @@ function App() {
 
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-red-700">Tornado: {alertCounts.tornado}</div>
+            <div className="px-2 py-1 rounded text-white bg-orange-800">Svr T-Storm: {alertCounts.severeWarn}</div>
             <div className="px-2 py-1 rounded text-white bg-orange-600">Severe: {alertCounts.severe}</div>
-            <div className="px-2 py-1 rounded text-white bg-orange-800">Severe Warnings: {alertCounts.severeWarn}</div>
             <div className="px-2 py-1 rounded text-white bg-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
             <div className="px-2 py-1 rounded text-white bg-yellow-600 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
             <div className="px-2 py-1 rounded text-white bg-blue-800 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
