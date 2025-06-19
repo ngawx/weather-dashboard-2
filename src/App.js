@@ -83,7 +83,6 @@ function App() {
   };
 
   const ffcActiveAlertCount = filteredAlerts.length;
-
   const timeSuffix = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT") ? "EDT" : "EST";
 
   const alertCounts = {
@@ -125,7 +124,14 @@ function App() {
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
         {selectedMap === "spc" && (
           <div className="text-xs mt-2 text-center">
-            <p><span className="text-green-500">Marginal</span> <span className="text-yellow-400">Slight</span> <span className="text-orange-500">Enhanced</span> <span className="text-red-600">Moderate</span> <span className="text-pink-500">High</span></p>
+            <p>
+              <span className="text-green-300">Light Green - General T-Storm</span>.&nbsp;
+              <span className="text-green-500">Dark Green - Marginal</span>.&nbsp;
+              <span className="text-yellow-400">Yellow - Slight</span>.&nbsp;
+              <span className="text-orange-500">Orange - Enhanced</span>.&nbsp;
+              <span className="text-red-600">Red - Moderate</span>.&nbsp;
+              <span className="text-pink-500">Magenta - High</span>
+            </p>
           </div>
         )}
       </div>
@@ -160,21 +166,23 @@ function App() {
           <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-4 min-h-[400px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-2 min-h-[400px]">
           <AnimatePresence mode="wait">
             {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
               const { event, effective, expires, areaDesc } = alert.properties;
               const colorClass = getAlertColor(event);
               return (
-                <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px]`}
+                <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px] flex flex-col justify-between`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}>
-                  <h3 className="text-lg font-bold mb-2">{event}</h3>
-                  <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-                  <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                  <div className="text-xs mt-2 overflow-y-auto max-h-24 whitespace-pre-line">
+                  <div>
+                    <h3 className="text-lg font-bold mb-2">{event}</h3>
+                    <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                    <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                  </div>
+                  <div className="text-xs mt-2 overflow-hidden whitespace-nowrap animate-marquee">
                     <strong>Affected Areas:</strong> {areaDesc}
                   </div>
                 </motion.div>
@@ -183,7 +191,7 @@ function App() {
           </AnimatePresence>
         </div>
 
-        <div className="w-full flex justify-center mb-6 min-h-[160px]">
+        <div className="w-full flex justify-center mt-1 mb-4 min-h-[160px]">
           <ConditionsScroll />
         </div>
       </div>
