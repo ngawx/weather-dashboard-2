@@ -57,15 +57,18 @@ export default function ConditionsScroll() {
   const cityData = data[index];
 
   return (
-    <div className="scroll-box fancy-gradient">
-      <div className="scroll-entry white-outline">
+    <div className="scroll-box fancy-gradient w-full">
+      <div className="scroll-entry white-outline w-full">
         <div className="city-name text-xl font-semibold text-center mb-2">{cityData.city}</div>
         <div className="current-condition-box text-center text-lg font-medium bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
           {cityData.current.temperature}°{cityData.current.temperatureUnit} – {cityData.current.shortForecast}
         </div>
-        <div className="forecast flex justify-between gap-2">
+        <div className="flex flex-col gap-2 w-full">
           {cityData.forecast.map((period, idx) => (
-            <div key={idx} className="forecast-hour p-2 rounded shadow text-center text-sm bg-gradient-to-b from-blue-900 to-blue-600 border border-white">
+            <div
+              key={idx}
+              className="forecast-hour p-2 rounded shadow text-center text-sm bg-gradient-to-b from-blue-900 to-blue-600 border border-white"
+            >
               <div className="font-bold text-white mb-1 text-sm">
                 {new Date(period.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
