@@ -83,6 +83,20 @@ function App() {
 
   const timeSuffix = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT") ? "EDT" : "EST";
 
+  const alertCounts = {
+    tornado: 0,
+    severe: 0,
+    watch: 0,
+    flood: 0
+  };
+  filteredAlerts.forEach(alert => {
+    const event = alert.properties.event.toLowerCase();
+    if (event.includes("tornado")) alertCounts.tornado++;
+    if (event.includes("severe")) alertCounts.severe++;
+    if (event.includes("watch")) alertCounts.watch++;
+    if (event.includes("flood")) alertCounts.flood++;
+  });
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative">
       <div className="w-full lg:w-1/2 pt-2 mb-4 lg:mb-0">
@@ -98,6 +112,11 @@ function App() {
               ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
               : "https://www.spc.noaa.gov/products/activity_loop.gif"
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
+        {selectedMap === "spc" && (
+          <div className="text-xs text-gray-300 mt-2 text-center">
+            <p>SPC Risk Levels: Marginal (Dark Green), Slight (Yellow), Enhanced (Orange), Moderate (Red), High (Magenta)</p>
+          </div>
+        )}
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-col items-center">
@@ -112,7 +131,14 @@ function App() {
           <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
         )}
 
-        <div className="flex justify-between items-center w-full px-4 mb-2">
+        <div className="flex gap-2 text-xs text-white mt-2">
+          <div className="bg-red-700 px-2 py-1 rounded">Tornado: {alertCounts.tornado}</div>
+          <div className="bg-orange-500 px-2 py-1 rounded">Severe: {alertCounts.severe}</div>
+          <div className="bg-yellow-500 px-2 py-1 rounded">Watches: {alertCounts.watch}</div>
+          <div className="bg-green-700 px-2 py-1 rounded">Flood: {alertCounts.flood}</div>
+        </div>
+
+        <div className="flex justify-between items-center w-full px-4 mb-2 mt-2">
           <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
           <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
           <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
@@ -146,7 +172,7 @@ function App() {
         </div>
       </div>
 
-      <footer className="absolute bottom-2 left-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
+      <footer className="absolute bottom-2 right-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
     </div>
   );
 }
