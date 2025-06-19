@@ -95,48 +95,50 @@ function App() {
         <img src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`} alt="Radar" className="w-full h-auto object-contain rounded" />
       </div>
 
-      <div className="w-full lg:w-1/2 flex flex-col items-center">
-        <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
-          {currentTime.toLocaleTimeString()} {timeSuffix}
+      <div className="w-full lg:w-1/2 flex flex-row">
+        <div className="flex-1 flex flex-col items-center">
+          <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-50 bg-gray-900 px-2 py-1 rounded shadow">
+            {currentTime.toLocaleTimeString()} {timeSuffix}
+          </div>
+
+          <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
+            Active Alerts: {ffcActiveAlertCount}
+          </div>
+          {ffcActiveAlertCount === 0 && (
+            <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
+          )}
+
+          <div className="flex justify-between items-center w-full px-4 mb-2">
+            <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
+            <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
+            <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-4 min-h-[400px]">
+            <AnimatePresence mode="wait">
+              {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
+                const { event, effective, expires, areaDesc } = alert.properties;
+                const colorClass = getAlertColor(event);
+                return (
+                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px]`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}>
+                    <h3 className="text-lg font-bold mb-2">{event}</h3>
+                    <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                    <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                    <div className="text-xs mt-2 overflow-x-auto whitespace-nowrap animate-marquee">
+                      <strong>Affected Areas:</strong> {areaDesc}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
-          Active Alerts: {ffcActiveAlertCount}
-        </div>
-        {ffcActiveAlertCount === 0 && (
-          <div className="text-sm text-gray-400 mt-2">No Active Alerts</div>
-        )}
-
-        <div className="flex justify-between items-center w-full px-4 mb-2">
-          <button onClick={handlePrev} className="bg-gray-700 px-3 py-1 rounded">◀</button>
-          <span className="text-xs text-gray-400">Showing {currentIndex + 1}–{Math.min(currentIndex + alertsPerPage, filteredAlerts.length)} of {filteredAlerts.length}</span>
-          <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4 mb-4 min-h-[400px]">
-          <AnimatePresence mode="wait">
-            {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
-              const { event, effective, expires, areaDesc } = alert.properties;
-              const colorClass = getAlertColor(event);
-              return (
-                <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[180px]`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}>
-                  <h3 className="text-lg font-bold mb-2">{event}</h3>
-                  <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-                  <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                  <div className="text-xs mt-2 overflow-y-auto max-h-24 whitespace-pre-line">
-                    <strong>Affected Areas:</strong> {areaDesc}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-
-        <div className="w-full flex justify-center mb-6 min-h-[160px]">
+        <div className="flex flex-col w-[250px] px-2 overflow-y-auto h-[600px] mt-8">
           <ConditionsScroll />
         </div>
       </div>
