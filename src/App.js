@@ -129,13 +129,13 @@ function App() {
             : selectedMap === "alerts"
             ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
             : "https://www.spc.noaa.gov/products/activity_loop.gif"
+  : selectedMap === "facebook feed"
+  ? "https://www.facebook.com/profile.php?id=61571227149657"
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
 
         {selectedMap === "spc" && (
           <div className="text-xs mt-2 text-center">
             <span className="text-green-400 font-bold">Light Green</span> – General T-Storm; <span className="text-green-700 font-bold">Dark Green</span> – Marginal; <span className="text-yellow-400 font-bold">Yellow</span> – Slight; <span className="text-orange-500 font-bold">Orange</span> – Enhanced; <span className="text-red-500 font-bold">Red</span> – Moderate; <span className="text-pink-400 font-bold">Magenta</span> – High
-         {selectedMap === "facebook feed"
-         ? "https://www.facebook.com/profile.php?id=61571227149657"
           </div>
         )}
       </div>
