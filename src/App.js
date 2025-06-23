@@ -121,6 +121,7 @@ function App() {
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
           <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
           <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
+          <button onClick={() => setSelectedMap("Facebook Feed")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
         </div>
         <img src={
           selectedMap === "radar"
@@ -133,6 +134,8 @@ function App() {
         {selectedMap === "spc" && (
           <div className="text-xs mt-2 text-center">
             <span className="text-green-400 font-bold">Light Green</span> – General T-Storm <span className="text-green-700 font-bold">Dark Green</span> – Marginal <span className="text-yellow-400 font-bold">Yellow</span> – Slight <span className="text-orange-500 font-bold">Orange</span> – Enhanced <span className="text-red-500 font-bold">Red</span> – Moderate <span className="text-pink-400 font-bold">Magenta</span> – High
+         selectedMap === "Facebook Feed"
+            ? `https://www.facebook.com/profile.php?id=61571227149657`
           </div>
         )}
       </div>
