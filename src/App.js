@@ -129,8 +129,6 @@ function App() {
             : selectedMap === "alerts"
             ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
             : "https://www.spc.noaa.gov/products/activity_loop.gif"
-  : selectedMap === "facebook feed"
-  ? "https://www.facebook.com/profile.php?id=61571227149657"
         } alt="Map Display" className="w-full h-auto object-contain rounded" />
 
         {selectedMap === "spc" && (
