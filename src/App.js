@@ -117,26 +117,53 @@ function App() {
     }`}>
 
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
-        <div className="flex justify-center gap-2 mb-2 flex-wrap">
-          <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
-          <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
-          <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
-          <button onClick={() => setSelectedMap("Facebook Feed")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
-        </div>
-        <img src={
-          selectedMap === "radar"
-            ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
-            : selectedMap === "alerts"
-            ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
-            : "https://www.spc.noaa.gov/products/activity_loop.gif"
-        } alt="Map Display" className="w-full h-auto object-contain rounded" />
+  <div className="flex justify-center gap-2 mb-2 flex-wrap">
+    <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+    <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+    <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
+    <button onClick={() => setSelectedMap("facebook")} className={`px-3 py-1 rounded text-sm ${selectedMap === "facebook" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
+  </div>
 
-        {selectedMap === "spc" && (
-          <div className="text-xs mt-2 text-center">
-            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm; <span className="text-green-700 font-bold">Dark Green</span> – Marginal; <span className="text-yellow-400 font-bold">Yellow</span> – Slight; <span className="text-orange-500 font-bold">Orange</span> – Enhanced; <span className="text-red-500 font-bold">Red</span> – Moderate; <span className="text-pink-400 font-bold">Magenta</span> – High
-          </div>
-        )}
-      </div>
+  {selectedMap === "facebook" ? (
+    <div className="w-full h-[600px]">
+      <iframe
+        title="Facebook Feed"
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FYourPageName&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+        width="100%"
+        height="600"
+        style={{ border: "none", overflow: "hidden" }}
+        scrolling="no"
+        frameBorder="0"
+        allowFullScreen={true}
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+      ></iframe>
+    </div>
+  ) : (
+    <img
+      src={
+        selectedMap === "radar"
+          ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
+          : selectedMap === "alerts"
+          ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
+          : "https://www.spc.noaa.gov/products/activity_loop.gif"
+      }
+      alt="Map Display"
+      className="w-full h-auto object-contain rounded"
+    />
+  )}
+
+  {selectedMap === "spc" && (
+    <div className="text-xs mt-2 text-center">
+      <span className="text-green-400 font-bold">Light Green</span> – General T-Storm;{" "}
+      <span className="text-green-700 font-bold">Dark Green</span> – Marginal;{" "}
+      <span className="text-yellow-400 font-bold">Yellow</span> – Slight;{" "}
+      <span className="text-orange-500 font-bold">Orange</span> – Enhanced;{" "}
+      <span className="text-red-500 font-bold">Red</span> – Moderate;{" "}
+      <span className="text-pink-400 font-bold">Magenta</span> – High
+    </div>
+  )}
+</div>
+
 
       <div className="w-full lg:w-1/2 flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col items-center">
