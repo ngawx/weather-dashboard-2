@@ -128,7 +128,7 @@ function App() {
     <div className="w-full h-[600px]">
       <iframe
         title="Facebook Feed"
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FNorthGeorgiaWeatherCommand&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D61571227149657&tabs=timeline&width=500&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
         width="100%"
         height="600"
         style={{ border: "none", overflow: "hidden" }}
