@@ -211,10 +211,6 @@ function App() {
                     <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
                     <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
 
-                    <div className="text-xs text-gray-400 mt-2">
-                      <strong>Click for list of impacted counties</strong>
-                    </div>
-
                     {/* Scrolling counties at the bottom */}
                     <div className="absolute bottom-0 left-0 w-full">
                       <div className="text-xs text-gray-400 overflow-hidden whitespace-nowrap">
