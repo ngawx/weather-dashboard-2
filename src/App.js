@@ -199,7 +199,7 @@ function App() {
                 const { event, effective, expires, areaDesc } = alert.properties;
                 const colorClass = getAlertColor(event);
                 return (
-                  <motion.div
+                  <motion.div>
                     key={idx}
                     className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`} // Add `relative` here
                     initial={{ opacity: 0, y: 20 }}
