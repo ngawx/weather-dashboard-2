@@ -12,8 +12,6 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
-  const [expandedAlert, setExpandedAlert] = useState(null); // State to track expanded alerts
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -114,10 +112,6 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
-  const toggleExpanded = (alertIndex) => {
-    setExpandedAlert(expandedAlert === alertIndex ? null : alertIndex); // Toggle expansion for clicked alert
-  };
-
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
       hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
@@ -212,7 +206,6 @@ function App() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
-                    onClick={() => toggleExpanded(idx)} // Toggle affected counties visibility on click
                   >
                     <h3 className="text-lg font-bold mb-2">{event}</h3>
                     <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
@@ -222,22 +215,14 @@ function App() {
                       <strong>Click for list of impacted counties</strong>
                     </div>
 
-                    <AnimatePresence>
-                      {expandedAlert === idx && (
-                        <motion.div
-                          className="text-xs mt-2 overflow-y-auto whitespace-nowrap max-h-[200px] scroll-auto"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
+                    {/* Scrolling counties at the bottom */}
+                    <div className="absolute bottom-0 left-0 w-full">
+                      <div className="text-xs text-gray-400 overflow-hidden whitespace-nowrap">
+                        <div className="animate-marquee">
                           <strong>Affected Areas:</strong> {areaDesc}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Accent bar on the left side of the badge */}
-                    <div className="absolute left-0 top-0 h-full w-2 bg-red-500"></div> 
+                        </div>
+                      </div>
+                    </div>
                   </motion.div>
                 );
               })}
