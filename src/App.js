@@ -225,7 +225,7 @@ function App() {
                     <AnimatePresence>
                       {expandedAlert === idx && (
                         <motion.div
-                          className="text-xs mt-2 overflow-x-auto whitespace-nowrap absolute left-0 top-full w-full"
+                          className="text-xs mt-2 overflow-y-auto whitespace-nowrap max-h-[200px] scroll-auto"
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
