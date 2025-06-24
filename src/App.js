@@ -9,10 +9,10 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [selectedMap, setSelectedMap] = useState("radar");
-  const [expandedIndex, setExpandedIndex] = useState(null);
-  const [showCounties, setShowCounties] = useState(null); // State to toggle counties visibility
+  const [expandedIndex, setExpandedIndex] = useState(null); // Track which alert is expanded
+  const [showCounties, setShowCounties] = useState({}); // Track counties visibility per alert
   const alertsPerPage = 4;
-  const resumeTimeout = useRef(null); // <-- make sure this line is here
+  const resumeTimeout = useRef(null);
 
   // Define alertCounts and ffcActiveAlertCount
   const alertCounts = {
@@ -88,7 +88,7 @@ function App() {
     if (lower.includes("watch")) return "bg-yellow-500 border-yellow-700 shadow-md";
     if (lower.includes("flood")) return "bg-green-700 border-green-900 shadow-md";
     if (lower.includes("heat")) return "bg-red-500 border-red-700 shadow-md";
-    return "bg-gray-600";
+    return "bg-gray-600 border-gray-700 shadow-md";
   };
 
   const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
@@ -100,12 +100,18 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
-  // Define the resumeAutoScroll function
   const resumeAutoScroll = () => {
     clearTimeout(resumeTimeout.current);
     resumeTimeout.current = setTimeout(() => {
       setAutoScroll(true);
     }, 15000);  // Set to 15 seconds or adjust as needed
+  };
+
+  const toggleCounties = (index) => {
+    setShowCounties((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index] // Toggle visibility for the clicked alert
+    }));
   };
 
   return (
@@ -186,7 +192,7 @@ function App() {
             <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
           </div>
 
-          <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[300px]">
+          <div className="flex flex-col gap-.5 w-full px-4 mb-4 min-h-[300px]">
             <AnimatePresence mode="wait">
               {visibleAlerts.map((alert, index) => {
                 const { event, areaDesc, effective, expires } = alert.properties;
@@ -194,39 +200,39 @@ function App() {
                 const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;/g, ", ") || "Unknown";
                 return (
                   <motion.div
-  key={index}
-  onClick={() => setExpandedIndex(index)}
-  className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm max-w-sm mx-auto relative overflow-hidden`}
-  initial={{ opacity: 0, y: 10 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, y: -10 }}
-  transition={{ duration: 0.4 }}
->
-  <h2 className="text-base font-semibold leading-snug">{event}</h2>
-  <p className="text-[10px] mt-1 mb-4">
-    🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
-    ⏳ <strong>Expires:</strong> {formatTime(expires)}
-  </p>
+                    key={index}
+                    onClick={() => setExpandedIndex(index)} // This will expand the clicked alert
+                    className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm w-[400px] mx-auto relative overflow-hidden`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <h2 className="text-base font-semibold leading-snug">{event}</h2>
+                    <p className="text-[10px] mt-1 mb-4">
+                      🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
+                      ⏳ <strong>Expires:</strong> {formatTime(expires)}
+                    </p>
 
-  {/* Container for Counties */}
-  <div className="text-sm mt-2">
-    <button
-      className="text-white-500"
-      onClick={() => setShowCounties(!showCounties)}
-    >
-      {showCounties ? "Hide Affected Counties" : "Show Affected Counties"}
-    </button>
+                    {/* Always show the "Show Affected Counties" button */}
+                    <div className="text-sm mt-2">
+                      <button
+                        className="text-white-500"
+                        onClick={() => toggleCounties(index)} // Toggle counties for the clicked alert
+                      >
+                        {showCounties[index] ? "Hide Affected Counties" : "Show Affected Counties"}
+                      </button>
 
-    {/* Consistent width for the badge, whether counties are visible or not */}
-    <div className={`mt-2 ${showCounties ? "w-full" : "min-w-[350px]"}`}>
-      {showCounties && (
-        <p className="text-sm mt-2">
-          <strong>Counties Affected:</strong> {counties.split(", ").join(", ")}
-        </p>
-      )}
-    </div>
-  </div>
-</motion.div>
+                      {/* Show counties only for the expanded alert */}
+                      {showCounties[index] && (
+                        <div className="mt-2">
+                          <p className="text-sm mt-2">
+                            <strong>Counties Affected:</strong> {counties.split(", ").join(", ")}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 );
               })}
             </AnimatePresence>
