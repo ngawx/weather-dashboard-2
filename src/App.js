@@ -218,6 +218,10 @@ function App() {
                     <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
                     <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
 
+                    <div className="text-xs text-gray-400 mt-2">
+                      <strong>Click for list of impacted counties</strong>
+                    </div>
+
                     {expandedAlert === idx && (
                       <div className="text-xs mt-2 overflow-x-auto whitespace-nowrap">
                         <strong>Affected Areas:</strong> {areaDesc}
