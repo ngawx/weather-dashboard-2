@@ -222,11 +222,19 @@ function App() {
                       <strong>Click for list of impacted counties</strong>
                     </div>
 
-                    {expandedAlert === idx && (
-                      <div className="text-xs mt-2 overflow-x-auto whitespace-nowrap">
-                        <strong>Affected Areas:</strong> {areaDesc}
-                      </div>
-                    )}
+                    <AnimatePresence>
+                      {expandedAlert === idx && (
+                        <motion.div
+                          className="text-xs mt-2 overflow-x-auto whitespace-nowrap"
+                          initial={{ height: 0 }}
+                          animate={{ height: "auto" }}
+                          exit={{ height: 0 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <strong>Affected Areas:</strong> {areaDesc}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
