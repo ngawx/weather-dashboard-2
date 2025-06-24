@@ -81,17 +81,37 @@ function App() {
     setSelectedBadge(key === selectedBadge ? null : key);
   };
 
+  const ffcActiveAlertCount = filteredAlerts.length;
+
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
       hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
     }`}>
 
-      <div className="flex flex-col p-4 w-full lg:w-3/4">
+      <div className="w-full lg:w-3/4 flex flex-col">
         <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
           {currentTime.toLocaleTimeString()} EDT
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-4 mt-10">
+        <div className="flex justify-center gap-2 mb-2 mt-10 flex-wrap">
+          <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+          <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+          <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
+        </div>
+
+        <div className="w-full px-4 mb-4">
+          {selectedMap === "radar" && <img src={`https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`} alt="Radar" className="w-full h-auto rounded" />}
+          {selectedMap === "alerts" && <img src="https://www.weather.gov/images/ffc/big/GA_WWA.png" alt="Alerts" className="w-full h-auto rounded" />}
+          {selectedMap === "spc" && <img src="https://www.spc.noaa.gov/products/activity_loop.gif" alt="SPC Map" className="w-full h-auto rounded" />}
+        </div>
+
+        {selectedMap === "spc" && (
+          <div className="text-xs text-center mb-4">
+            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm; <span className="text-green-700 font-bold">Dark Green</span> – Marginal; <span className="text-yellow-400 font-bold">Yellow</span> – Slight; <span className="text-orange-500 font-bold">Orange</span> – Enhanced; <span className="text-red-500 font-bold">Red</span> – Moderate; <span className="text-pink-400 font-bold">Magenta</span> – High
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-center gap-3 mb-4">
           {alertTypes.map(({ key, label, gradient }) => (
             <div
               key={key}
