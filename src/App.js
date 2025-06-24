@@ -196,27 +196,22 @@ function App() {
           <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
               {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
-                const { event, effective, expires, areaDesc } = alert.properties;
+                const { event, effective, expires } = alert.properties;
                 const colorClass = getAlertColor(event);
                 return (
                   <motion.div
-  key={idx}
-  className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`} // Add `relative` here
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, y: -20 }}
-  transition={{ duration: 0.5 }}
->
-  <h3 className="text-lg font-bold mb-2">{event}</h3>
-  <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-  <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-
-  {/* Counties integrated into the badge */}
-  <div className="absolute bottom-0 left-0 w-full text-xs text-gray-400 px-2 py-1">
-    <strong>Affected Areas: </strong>
-    {areaDesc} {/* This will be the list of counties */}
-  </div>
-</motion.div>
+                    key={idx}
+                    className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`} // Add `relative` here
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h3 className="text-lg font-bold mb-2">{event}</h3>
+                    <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
+                    <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
+                    {/* Counties are no longer shown */}
+                  </motion.div>
                 );
               })}
             </AnimatePresence>
