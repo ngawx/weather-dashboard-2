@@ -50,27 +50,28 @@
 .animate-marquee {
   animation: marquee 10s linear infinite;
   white-space: nowrap; /* Ensure text doesn't wrap */
-  display: inline-block; /* Ensures the content stays in one line */
+  display: inline-block; /* Keeps the counties on one line */
 }
 
 /* Parent container for the scrolling counties */
 .marquee-container {
-  overflow: hidden; /* Hide anything outside the container */
-  position: relative; /* Allow absolute positioning inside */
-  width: 100%; /* Ensure it takes up full width */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Ensure full width */
+  overflow: hidden; /* Hide the overflowing content */
+  padding-bottom: 10px; /* Add space below the badge */
   background-color: #282c34; /* Match background color */
-  padding-bottom: 10px; /* Space at the bottom of the badge */
 }
 
-.text-gray-400 {
-  color: #b0b0b0;
-}
-
-.text-xs {
+/* The counties list that scrolls horizontally */
+.scrollable-counties {
+  display: inline-block;
+  animation: marquee 10s linear infinite; /* Apply the scrolling animation */
+  color: #b0b0b0; /* Text color */
   font-size: 12px;
 }
 
-/* Add a little style to make sure the text looks clean */
 .text-xs strong {
   font-weight: bold;
 }
