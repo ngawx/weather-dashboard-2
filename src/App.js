@@ -213,8 +213,7 @@ function App() {
 
                     {/* Scrolling counties at the bottom */}
                    <div className="absolute bottom-0 left-0 w-full marquee-container">
-  <div className="absolute bottom-0 left-0 w-full marquee-container">
-  <div className="scrollable-counties">
+  <div className="scrollable-counties animate-marquee">
     <strong>Affected Areas:</strong> {areaDesc}
   </div>
 </div>
