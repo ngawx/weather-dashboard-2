@@ -225,10 +225,10 @@ function App() {
                     <AnimatePresence>
                       {expandedAlert === idx && (
                         <motion.div
-                          className="text-xs mt-2 overflow-x-auto whitespace-nowrap"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 20 }}
+                          className="text-xs mt-2 overflow-x-auto whitespace-nowrap absolute left-0 top-full w-full"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.5 }}
                         >
                           <strong>Affected Areas:</strong> {areaDesc}
