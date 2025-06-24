@@ -52,6 +52,7 @@
   animation: marquee 10s linear infinite;
   white-space: nowrap; /* Ensure text doesn't wrap */
   display: inline-block; /* Keeps the counties on one line */
+  padding-right: 100%; /* Ensure there's enough space for scrolling */
 }
 
 /* Parent container for the scrolling counties */
@@ -75,4 +76,3 @@
 .text-xs strong {
   font-weight: bold;
 }
-
