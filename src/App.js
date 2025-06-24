@@ -9,8 +9,19 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [selectedMap, setSelectedMap] = useState("radar");
+  const [expandedIndex, setExpandedIndex] = useState(null);
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
+
+  // Define alertCounts and ffcActiveAlertCount
+  const alertCounts = {
+    tornado: 0,
+    severe: 0,
+    severeWarn: 0,
+    flood: 0,
+    heat: 0,
+    cold: 0
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,7 +55,32 @@ function App() {
     return isFromFFC && isActiveOrFuture;
   });
 
-  const getAlertColor = (event) => {
+  // Populate alertCounts based on filteredAlerts
+  filteredAlerts.forEach(alert => {
+    const event = alert.properties.event.toLowerCase();
+    if (event.includes("tornado")) alertCounts.tornado++;
+    if (event.includes("severe") && event.includes("warning")) alertCounts.severeWarn++;
+    if (event.includes("severe")) alertCounts.severe++;
+    if (event.includes("flood")) alertCounts.flood++;
+    if (event.includes("heat")) alertCounts.heat++;
+    if (event.includes("cold") || event.includes("blizzard") || event.includes("freeze")) alertCounts.cold++;
+  });
+
+  const ffcActiveAlertCount = filteredAlerts.length;
+
+  const handlePrev = () => {
+    setAutoScroll(false);
+    setCurrentIndex((prev) => (prev - alertsPerPage + filteredAlerts.length) % filteredAlerts.length);
+    resumeAutoScroll();
+  };
+
+  const handleNext = () => {
+    setAutoScroll(false);
+    setCurrentIndex((prev) => (prev + alertsPerPage) % filteredAlerts.length);
+    resumeAutoScroll();
+  };
+
+  const getAlertStyles = (event) => {
     const lower = event.toLowerCase();
     if (lower.includes("tornado")) return "bg-red-700";
     if (lower.includes("severe")) return "bg-orange-500";
@@ -52,6 +88,12 @@ function App() {
     if (lower.includes("flood")) return "bg-green-700";
     if (lower.includes("heat")) return "bg-red-500";
     return "bg-gray-600";
+  };
+
+  const visibleAlerts = filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage);
+
+  const formatTime = (time) => {
+    return new Date(time).toLocaleString();
   };
 
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
