@@ -226,9 +226,9 @@ function App() {
                       {expandedAlert === idx && (
                         <motion.div
                           className="text-xs mt-2 overflow-x-auto whitespace-nowrap"
-                          initial={{ height: 0 }}
-                          animate={{ height: "auto" }}
-                          exit={{ height: 0 }}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
                           transition={{ duration: 0.5 }}
                         >
                           <strong>Affected Areas:</strong> {areaDesc}
