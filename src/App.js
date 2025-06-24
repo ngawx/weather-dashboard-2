@@ -166,7 +166,7 @@ function App() {
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-red-700">Tornado: {alertCounts.tornado}</div>
             <div className="px-2 py-1 rounded text-white bg-orange-600">Svr T-Storm: {alertCounts.severeWarn}</div>
-            <div className="px-2 py-1 rounded text-white bg-yellow-500">Severe: {alertCounts.severe}</div>
+            <div className="px-2 py-1 rounded text-white bg-yellow-500 cursor-pointer" title="Tornado & Severe T-Storm Watch">Severe: {alertCounts.severe}</div>
             <div className="px-2 py-1 rounded text-white bg-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
             <div className="px-2 py-1 rounded text-white bg-red-400 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
             <div className="px-2 py-1 rounded text-white bg-blue-800 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
@@ -185,7 +185,7 @@ function App() {
             <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
           </div>
 
-          <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[400px]">
+          <div className="flex flex-col gap-4 w-8 px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
               {visibleAlerts.map((alert, index) => {
                 const { event, areaDesc, effective, expires } = alert.properties;
