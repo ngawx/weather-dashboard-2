@@ -207,7 +207,7 @@ function App() {
                 return (
                   <motion.div
                     key={idx}
-                    className={`p-4 rounded shadow ${colorClass} min-h-[120px]`}
+                    className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`} // Add `relative` here
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
@@ -235,6 +235,9 @@ function App() {
                         </motion.div>
                       )}
                     </AnimatePresence>
+
+                    {/* Accent bar on the left side of the badge */}
+                    <div className="absolute left-0 top-0 h-full w-2 bg-red-500"></div> 
                   </motion.div>
                 );
               })}
