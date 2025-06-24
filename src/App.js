@@ -137,30 +137,29 @@ function App() {
 
           <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
-              {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
-                const { event, effective, expires, areaDesc } = alert.properties;
-                const colorClass = getAlertColor(event);
-                const affectedCounties = areaDesc.split(","); // Adjust based on the actual data structure of counties
+              {visibleAlerts.map((alert, index) => {
+                const { event, areaDesc, effective, expires } = alert.properties;
+                const alertStyle = getAlertStyles(event);
+                const counties = areaDesc?.replace(/;?\s?GA/g, "").replace(/;/g, ", ") || "Unknown";
                 return (
                   <motion.div
-                    key={idx}
-                    className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`}
-                    initial={{ opacity: 0, y: 20 }}
+                    key={index}
+                    onClick={() => setExpandedIndex(index)}
+                    className={`p-2 mb-2 ${alertStyle} border-l-4 rounded-md shadow-md cursor-pointer transition-transform hover:scale-[1.01] text-sm max-w-sm mx-auto relative overflow-hidden`}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
                   >
-                    <h3 className="text-lg font-bold mb-2">{event}</h3>
-                    <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
-                    <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-
-                    {/* Scrollable counties */}
-                    <div className="mt-2 overflow-auto max-h-24">
-                      <ul className="list-none text-xs">
-                        {affectedCounties.map((county, idx) => (
-                          <li key={idx} className="text-gray-200">{county.trim()}</li>
-                        ))}
-                      </ul>
+                    <h2 className="text-base font-semibold leading-snug">{event}</h2>
+                    <p className="text-[10px] mt-1 mb-4">
+                      🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
+                      ⏳ <strong>Expires:</strong> {formatTime(expires)}
+                    </p>
+                    <div className="absolute bottom-1 left-0 w-full overflow-hidden bg-opacity-0">
+                      <div className="whitespace-nowrap animate-marquee text-[10px] text-gray-300 px-2">
+                        📍 <strong>Counties Affected:</strong> {counties}
+                      </div>
                     </div>
                   </motion.div>
                 );
