@@ -185,7 +185,7 @@ function App() {
             <button onClick={handleNext} className="bg-gray-700 px-3 py-1 rounded">▶</button>
           </div>
 
-          <div className="flex flex-col gap-4 w-8 px-4 mb-4 min-h-[400px]">
+          <div className="flex flex-col gap-1 w-full px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
               {visibleAlerts.map((alert, index) => {
                 const { event, areaDesc, effective, expires } = alert.properties;
