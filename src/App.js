@@ -9,7 +9,6 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [selectedMap, setSelectedMap] = useState("radar");
-  const [selectedBadge, setSelectedBadge] = useState(null);
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
@@ -49,15 +48,6 @@ function App() {
     /tornado|severe thunderstorm|watch/i.test(alert.properties.event)
   );
 
-  const alertTypes = [
-    { key: "tornado", label: "Tornado", gradient: "from-red-600 to-red-800" },
-    { key: "severeWarn", label: "Svr T-Storm", gradient: "from-orange-400 to-orange-700" },
-    { key: "severe", label: "Severe", gradient: "from-yellow-400 to-yellow-600" },
-    { key: "flood", label: "Flood", gradient: "from-green-600 to-green-800" },
-    { key: "heat", label: "Heat", gradient: "from-pink-400 to-pink-700" },
-    { key: "cold", label: "Cold", gradient: "from-blue-600 to-blue-800" },
-  ];
-
   const alertCounts = {
     tornado: 0,
     severe: 0,
@@ -77,11 +67,10 @@ function App() {
     if (event.includes("cold") || event.includes("blizzard") || event.includes("freeze")) alertCounts.cold++;
   });
 
-  const handleBadgeClick = (key) => {
-    setSelectedBadge(key === selectedBadge ? null : key);
-  };
-
   const ffcActiveAlertCount = filteredAlerts.length;
+
+  const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
+  const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
@@ -90,7 +79,7 @@ function App() {
 
       <div className="w-full lg:w-3/4 flex flex-col">
         <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
-          {currentTime.toLocaleTimeString()} EDT
+          {currentTime.toLocaleTimeString()} {timeSuffix}
         </div>
 
         <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4 self-center">
@@ -99,6 +88,15 @@ function App() {
         {ffcActiveAlertCount === 0 && (
           <div className="text-sm text-gray-400 text-center mt-2">No Active Alerts</div>
         )}
+
+        <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-4">
+          <div className="px-2 py-1 rounded text-white bg-red-700">Tornado: {alertCounts.tornado}</div>
+          <div className="px-2 py-1 rounded text-white bg-orange-600">Svr T-Storm: {alertCounts.severeWarn}</div>
+          <div className="px-2 py-1 rounded text-white bg-yellow-500">Severe: {alertCounts.severe}</div>
+          <div className="px-2 py-1 rounded text-white bg-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
+          <div className="px-2 py-1 rounded text-white bg-red-400 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
+          <div className="px-2 py-1 rounded text-white bg-blue-800 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
+        </div>
 
         <div className="flex justify-center gap-2 mb-2 mt-4 flex-wrap">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
@@ -115,29 +113,6 @@ function App() {
         {selectedMap === "spc" && (
           <div className="text-xs text-center mb-4">
             <span className="text-green-400 font-bold">Light Green</span> – General T-Storm; <span className="text-green-700 font-bold">Dark Green</span> – Marginal; <span className="text-yellow-400 font-bold">Yellow</span> – Slight; <span className="text-orange-500 font-bold">Orange</span> – Enhanced; <span className="text-red-500 font-bold">Red</span> – Moderate; <span className="text-pink-400 font-bold">Magenta</span> – High
-          </div>
-        )}
-
-        <div className="flex flex-wrap justify-center gap-3 mb-4">
-          {alertTypes.map(({ key, label, gradient }) => (
-            <div
-              key={key}
-              className={`px-3 py-1 text-white text-sm rounded cursor-pointer bg-gradient-to-r ${gradient}`}
-              onClick={() => handleBadgeClick(key)}
-            >
-              {label}: {alertCounts[key]}
-            </div>
-          ))}
-        </div>
-
-        {selectedBadge && (
-          <div className="bg-gray-800 p-4 rounded text-white max-w-xl mx-auto">
-            <h3 className="text-lg font-bold mb-2">Affected Areas for {alertTypes.find(t => t.key === selectedBadge).label}</h3>
-            <ul className="list-disc list-inside text-sm space-y-1 max-h-[200px] overflow-y-auto">
-              {filteredAlerts.filter(alert => alert.properties.event.toLowerCase().includes(selectedBadge)).map((alert, index) => (
-                <li key={index}>{alert.properties.areaDesc}</li>
-              ))}
-            </ul>
           </div>
         )}
       </div>
