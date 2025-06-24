@@ -112,16 +112,16 @@ function App() {
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
   return (
-    <div className={min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
+    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
       hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
-    }}>
+    }`}>
 
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
   <div className="flex justify-center gap-2 mb-2 flex-wrap">
-    <button onClick={() => setSelectedMap("radar")} className={px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}}>Current Radar</button>
-    <button onClick={() => setSelectedMap("alerts")} className={px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}}>Active Alerts Map</button>
-    <button onClick={() => setSelectedMap("spc")} className={px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}}>SPC Map</button>
-    <button onClick={() => setSelectedMap("facebook")} className={px-3 py-1 rounded text-sm ${selectedMap === "facebook" ? "bg-blue-600" : "bg-gray-700"}}>Facebook Feed</button>
+    <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+    <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+    <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
+    <button onClick={() => setSelectedMap("facebook")} className={`px-3 py-1 rounded text-sm ${selectedMap === "facebook" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
   </div>
 
   {selectedMap === "facebook" ? (
@@ -142,7 +142,7 @@ function App() {
     <img
       src={
         selectedMap === "radar"
-          ? https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}
+          ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
           : selectedMap === "alerts"
           ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
           : "https://www.spc.noaa.gov/products/activity_loop.gif"
@@ -199,7 +199,7 @@ function App() {
                 const { event, effective, expires, areaDesc } = alert.properties;
                 const colorClass = getAlertColor(event);
                 return (
-                  <motion.div key={idx} className={p-4 rounded shadow ${colorClass} min-h-[120px]}
+                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[120px]`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
