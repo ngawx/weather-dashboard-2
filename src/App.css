@@ -36,16 +36,42 @@
     transform: rotate(360deg);
   }
 }
+
 /* Marquee effect for scrolling the counties list */
 @keyframes marquee {
   0% {
-    transform: translateX(100%);
+    transform: translateX(100%); /* Start from the right */
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-100%); /* Move to the left */
   }
 }
 
 .animate-marquee {
   animation: marquee 10s linear infinite;
+  white-space: nowrap; /* Ensure text doesn't wrap */
+  display: inline-block; /* Ensures the content stays in one line */
 }
+
+/* Parent container for the scrolling counties */
+.marquee-container {
+  overflow: hidden; /* Hide anything outside the container */
+  position: relative; /* Allow absolute positioning inside */
+  width: 100%; /* Ensure it takes up full width */
+  background-color: #282c34; /* Match background color */
+  padding-bottom: 10px; /* Space at the bottom of the badge */
+}
+
+.text-gray-400 {
+  color: #b0b0b0;
+}
+
+.text-xs {
+  font-size: 12px;
+}
+
+/* Add a little style to make sure the text looks clean */
+.text-xs strong {
+  font-weight: bold;
+}
+
