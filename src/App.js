@@ -99,6 +99,14 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
+  // Define the resumeAutoScroll function
+  const resumeAutoScroll = () => {
+    clearTimeout(resumeTimeout.current);
+    resumeTimeout.current = setTimeout(() => {
+      setAutoScroll(true);
+    }, 15000);  // Set to 15 seconds or adjust as needed
+  };
+
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500`}>
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
