@@ -212,13 +212,13 @@ function App() {
                     <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
 
                     {/* Scrolling counties at the bottom */}
-                    <div className="absolute bottom-0 left-0 w-full">
-                      <div className="text-xs text-gray-400 overflow-hidden whitespace-nowrap">
-                        <div className="animate-marquee">
-                          <strong>Affected Areas:</strong> {areaDesc}
-                        </div>
-                      </div>
-                    </div>
+                   <div className="absolute bottom-0 left-0 w-full marquee-container">
+  <div className="text-xs text-gray-400 overflow-hidden">
+    <div className="animate-marquee">
+      <strong>Affected Areas:</strong> {areaDesc}
+    </div>
+  </div>
+</div>
                   </motion.div>
                 );
               })}
