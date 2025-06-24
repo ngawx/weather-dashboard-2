@@ -103,6 +103,7 @@ function App() {
     if (lower.includes("severe")) return "bg-orange-500";
     if (lower.includes("watch")) return "bg-yellow-500";
     if (lower.includes("flood")) return "bg-green-700";
+    if (lower.includes("heat")) return "bg-red-500";
     return "bg-gray-600";
   };
 
