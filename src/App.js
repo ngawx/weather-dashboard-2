@@ -82,29 +82,44 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col p-4">
-      <div className="flex flex-wrap justify-center gap-3 mb-4">
-        {alertTypes.map(({ key, label, gradient }) => (
-          <div
-            key={key}
-            className={`px-3 py-1 text-white text-sm rounded cursor-pointer bg-gradient-to-r ${gradient}`}
-            onClick={() => handleBadgeClick(key)}
-          >
-            {label}: {alertCounts[key]}
+    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
+      hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
+    }`}>
+
+      <div className="flex flex-col p-4 w-full lg:w-3/4">
+        <div className="fixed top-2 left-2 text-sm sm:text-base font-mono z-40 bg-gray-900 px-2 py-1 rounded shadow">
+          {currentTime.toLocaleTimeString()} EDT
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3 mb-4 mt-10">
+          {alertTypes.map(({ key, label, gradient }) => (
+            <div
+              key={key}
+              className={`px-3 py-1 text-white text-sm rounded cursor-pointer bg-gradient-to-r ${gradient}`}
+              onClick={() => handleBadgeClick(key)}
+            >
+              {label}: {alertCounts[key]}
+            </div>
+          ))}
+        </div>
+
+        {selectedBadge && (
+          <div className="bg-gray-800 p-4 rounded text-white max-w-xl mx-auto">
+            <h3 className="text-lg font-bold mb-2">Affected Areas for {alertTypes.find(t => t.key === selectedBadge).label}</h3>
+            <ul className="list-disc list-inside text-sm space-y-1 max-h-[200px] overflow-y-auto">
+              {filteredAlerts.filter(alert => alert.properties.event.toLowerCase().includes(selectedBadge)).map((alert, index) => (
+                <li key={index}>{alert.properties.areaDesc}</li>
+              ))}
+            </ul>
           </div>
-        ))}
+        )}
       </div>
 
-      {selectedBadge && (
-        <div className="bg-gray-800 p-4 rounded text-white max-w-xl mx-auto">
-          <h3 className="text-lg font-bold mb-2">Affected Areas for {alertTypes.find(t => t.key === selectedBadge).label}</h3>
-          <ul className="list-disc list-inside text-sm space-y-1 max-h-[200px] overflow-y-auto">
-            {filteredAlerts.filter(alert => alert.properties.event.toLowerCase().includes(selectedBadge)).map((alert, index) => (
-              <li key={index}>{alert.properties.areaDesc}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="flex flex-col w-full lg:w-1/4 px-2 overflow-y-auto h-[600px] mt-8">
+        <ConditionsScroll />
+      </div>
+
+      <footer className="absolute bottom-2 right-2 text-xs text-gray-500">© 2025 All Rights Reserved P.J. Gudz</footer>
     </div>
   );
 }
