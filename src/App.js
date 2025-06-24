@@ -12,6 +12,8 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
+  const [expandedAlert, setExpandedAlert] = useState(null); // State to track expanded alerts
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -112,59 +114,62 @@ function App() {
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
+  const toggleExpanded = (alertIndex) => {
+    setExpandedAlert(expandedAlert === alertIndex ? null : alertIndex); // Toggle expansion for clicked alert
+  };
+
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
       hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
     }`}>
 
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
-  <div className="flex justify-center gap-2 mb-2 flex-wrap">
-    <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
-    <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
-    <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
-    <button onClick={() => setSelectedMap("facebook")} className={`px-3 py-1 rounded text-sm ${selectedMap === "facebook" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
-  </div>
+        <div className="flex justify-center gap-2 mb-2 flex-wrap">
+          <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
+          <button onClick={() => setSelectedMap("alerts")} className={`px-3 py-1 rounded text-sm ${selectedMap === "alerts" ? "bg-blue-600" : "bg-gray-700"}`}>Active Alerts Map</button>
+          <button onClick={() => setSelectedMap("spc")} className={`px-3 py-1 rounded text-sm ${selectedMap === "spc" ? "bg-blue-600" : "bg-gray-700"}`}>SPC Map</button>
+          <button onClick={() => setSelectedMap("facebook")} className={`px-3 py-1 rounded text-sm ${selectedMap === "facebook" ? "bg-blue-600" : "bg-gray-700"}`}>Facebook Feed</button>
+        </div>
 
-  {selectedMap === "facebook" ? (
-    <div className="w-full h-[600px]">
-      <iframe
-        title="Facebook Feed"
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FNorthGaWxCommand&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
-        width="125%"
-        height="600"
-        style={{ border: "none", overflow: "hidden" }}
-        scrolling="no"
-        frameBorder="0"
-        allowFullScreen={true}
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-      ></iframe>
-    </div>
-  ) : (
-    <img
-      src={
-        selectedMap === "radar"
-          ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
-          : selectedMap === "alerts"
-          ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
-          : "https://www.spc.noaa.gov/products/activity_loop.gif"
-      }
-      alt="Map Display"
-      className="w-full h-auto object-contain rounded"
-    />
-  )}
+        {selectedMap === "facebook" ? (
+          <div className="w-full h-[600px]">
+            <iframe
+              title="Facebook Feed"
+              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FNorthGaWxCommand&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId"
+              width="125%"
+              height="600"
+              style={{ border: "none", overflow: "hidden" }}
+              scrolling="no"
+              frameBorder="0"
+              allowFullScreen={true}
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            ></iframe>
+          </div>
+        ) : (
+          <img
+            src={
+              selectedMap === "radar"
+                ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
+                : selectedMap === "alerts"
+                ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
+                : "https://www.spc.noaa.gov/products/activity_loop.gif"
+            }
+            alt="Map Display"
+            className="w-full h-auto object-contain rounded"
+          />
+        )}
 
-  {selectedMap === "spc" && (
-    <div className="text-xs mt-2 text-center">
-      <span className="text-green-400 font-bold">Light Green</span> – General T-Storm;{" "}
-      <span className="text-green-700 font-bold">Dark Green</span> – Marginal;{" "}
-      <span className="text-yellow-400 font-bold">Yellow</span> – Slight;{" "}
-      <span className="text-orange-500 font-bold">Orange</span> – Enhanced;{" "}
-      <span className="text-red-500 font-bold">Red</span> – Moderate;{" "}
-      <span className="text-pink-400 font-bold">Magenta</span> – High
-    </div>
-  )}
-</div>
-
+        {selectedMap === "spc" && (
+          <div className="text-xs mt-2 text-center">
+            <span className="text-green-400 font-bold">Light Green</span> – General T-Storm;{" "}
+            <span className="text-green-700 font-bold">Dark Green</span> – Marginal;{" "}
+            <span className="text-yellow-400 font-bold">Yellow</span> – Slight;{" "}
+            <span className="text-orange-500 font-bold">Orange</span> – Enhanced;{" "}
+            <span className="text-red-500 font-bold">Red</span> – Moderate;{" "}
+            <span className="text-pink-400 font-bold">Magenta</span> – High
+          </div>
+        )}
+      </div>
 
       <div className="w-full lg:w-1/2 flex flex-col md:flex-row">
         <div className="flex-1 flex flex-col items-center">
@@ -200,17 +205,24 @@ function App() {
                 const { event, effective, expires, areaDesc } = alert.properties;
                 const colorClass = getAlertColor(event);
                 return (
-                  <motion.div key={idx} className={`p-4 rounded shadow ${colorClass} min-h-[120px]`}
+                  <motion.div
+                    key={idx}
+                    className={`p-4 rounded shadow ${colorClass} min-h-[120px]`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}>
+                    transition={{ duration: 0.5 }}
+                    onClick={() => toggleExpanded(idx)} // Toggle affected counties visibility on click
+                  >
                     <h3 className="text-lg font-bold mb-2">{event}</h3>
                     <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
                     <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                    <div className="text-xs mt-2 overflow-x-auto whitespace-nowrap animate-marquee">
-                      <strong>Affected Areas:</strong> {areaDesc}
-                    </div>
+
+                    {expandedAlert === idx && (
+                      <div className="text-xs mt-2 overflow-x-auto whitespace-nowrap">
+                        <strong>Affected Areas:</strong> {areaDesc}
+                      </div>
+                    )}
                   </motion.div>
                 );
               })}
