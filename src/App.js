@@ -108,7 +108,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500`}>
+    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${filteredAlerts.length > 0 ? 'bg-red-100' : 'bg-gray-900 text-white'}`}>
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
         <div className="flex justify-center gap-2 mb-2 flex-wrap">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
