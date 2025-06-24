@@ -44,59 +44,6 @@ function App() {
     return isFromFFC && isActiveOrFuture;
   });
 
-  const hasSevereAlerts = filteredAlerts.some(alert =>
-    /tornado|severe thunderstorm|watch/i.test(alert.properties.event)
-  );
-
-  const alertCounts = {
-    tornado: 0,
-    severe: 0,
-    severeWarn: 0,
-    flood: 0,
-    heat: 0,
-    cold: 0
-  };
-
-  filteredAlerts.forEach(alert => {
-    const event = alert.properties.event.toLowerCase();
-    if (event.includes("tornado")) alertCounts.tornado++;
-    if (event.includes("severe") && event.includes("warning")) alertCounts.severeWarn++;
-    if (event.includes("severe")) alertCounts.severe++;
-    if (event.includes("flood")) alertCounts.flood++;
-    if (event.includes("heat")) alertCounts.heat++;
-    if (event.includes("cold") || event.includes("blizzard") || event.includes("freeze")) alertCounts.cold++;
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (autoScroll && filteredAlerts.length > alertsPerPage) {
-        setCurrentIndex((prev) => (prev + alertsPerPage) % filteredAlerts.length);
-      }
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [filteredAlerts, autoScroll]);
-
-  const resumeAutoScroll = () => {
-    clearTimeout(resumeTimeout.current);
-    resumeTimeout.current = setTimeout(() => {
-      setAutoScroll(true);
-    }, 15000);
-  };
-
-  const handleNext = () => {
-    setAutoScroll(false);
-    setCurrentIndex((prev) => (prev + alertsPerPage) % filteredAlerts.length);
-    resumeAutoScroll();
-  };
-
-  const handlePrev = () => {
-    setAutoScroll(false);
-    setCurrentIndex((prev) =>
-      (prev - alertsPerPage + filteredAlerts.length) % filteredAlerts.length
-    );
-    resumeAutoScroll();
-  };
-
   const getAlertColor = (event) => {
     const lower = event.toLowerCase();
     if (lower.includes("tornado")) return "bg-red-700";
@@ -107,16 +54,11 @@ function App() {
     return "bg-gray-600";
   };
 
-  const ffcActiveAlertCount = filteredAlerts.length;
-
   const isDaylightSaving = currentTime.toLocaleString("en-US", { timeZoneName: "short" }).includes("DT");
   const timeSuffix = isDaylightSaving ? "EDT" : "EST";
 
   return (
-    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500 ${
-      hasSevereAlerts ? 'bg-red-100' : 'bg-gray-900 text-white'
-    }`}>
-
+    <div className={`min-h-screen flex flex-col lg:flex-row pt-0 px-2 sm:px-4 relative transition-colors duration-500`}>
       <div className="w-full lg:w-1/2 pt-10 mb-4 lg:mb-0">
         <div className="flex justify-center gap-2 mb-2 flex-wrap">
           <button onClick={() => setSelectedMap("radar")} className={`px-3 py-1 rounded text-sm ${selectedMap === "radar" ? "bg-blue-600" : "bg-gray-700"}`}>Current Radar</button>
@@ -196,12 +138,13 @@ function App() {
           <div className="flex flex-col gap-4 w-full px-4 mb-4 min-h-[400px]">
             <AnimatePresence mode="wait">
               {filteredAlerts.slice(currentIndex, currentIndex + alertsPerPage).map((alert, idx) => {
-                const { event, effective, expires } = alert.properties;
+                const { event, effective, expires, areaDesc } = alert.properties;
                 const colorClass = getAlertColor(event);
+                const affectedCounties = areaDesc.split(","); // Adjust based on the actual data structure of counties
                 return (
                   <motion.div
                     key={idx}
-                    className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`} // Add `relative` here
+                    className={`p-4 rounded shadow ${colorClass} min-h-[120px] relative`}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
@@ -210,7 +153,15 @@ function App() {
                     <h3 className="text-lg font-bold mb-2">{event}</h3>
                     <p className="text-sm">Effective: {new Date(effective).toLocaleString()}</p>
                     <p className="text-sm">Expires: {new Date(expires).toLocaleString()}</p>
-                    {/* Counties are no longer shown */}
+
+                    {/* Scrollable counties */}
+                    <div className="mt-2 overflow-auto max-h-24">
+                      <ul className="list-none text-xs">
+                        {affectedCounties.map((county, idx) => (
+                          <li key={idx} className="text-gray-200">{county.trim()}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </motion.div>
                 );
               })}
