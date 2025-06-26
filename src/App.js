@@ -92,7 +92,7 @@ function App() {
     const event = alert.properties.event.toLowerCase();
     if (event.includes("tornado")) alertCounts.tornado++;
     if (event.includes("severe") && event.includes("warning")) alertCounts.severeWarn++;
-    if (event.includes("severe")) alertCounts.severe++;
+    if (event.includes("severe") && event.includes("watch")) alertCounts.severe++;
     if (event.includes("flood")) alertCounts.flood++;
     if (event.includes("heat advisory")) alertCounts.heatAdvisory++; // Heat Advisory Alerts
     if (event.includes("heat")) alertCounts.heat++; // For Heat Advisory
@@ -208,7 +208,7 @@ function App() {
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-red-500 to-red-900">Tornado: {alertCounts.tornado}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-orange-500 to-orange-900">Svr T-Storm: {alertCounts.severeWarn}</div>
-            <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-yellow-300 to-yellow-600 cursor-pointer" title="Tornado & Severe T-Storm Watch">Severe: {alertCounts.severe}</div>
+            <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-yellow-300 to-yellow-600 cursor-pointer" title="Tornado & Severe T-Storm Watch">Severe Watches: {alertCounts.severe}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-green-500 to-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-red-300 to-red-500 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-blue-500 to-blue-900 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
@@ -244,14 +244,17 @@ function App() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <h2 className="text-base font-semibold leading-snug">{event}</h2>
-                    <p className="text-[12px] mt-1 mb-4">
+                    <h2 className="text-base font-bold leading-snug">{event}</h2>
+                    <p className="text-[12px] mt-1 mb-1">
                        <strong>Effective:</strong> {formatTime(effective)}<br />
                        <strong>Expires:</strong> {formatTime(expires)}
+<div className="flex justify-between text-xs font-medium text-gray-300 mt-1">
+    <p><strong></strong> {alert.properties.senderName}<strong> | Severity:</strong> {alert.properties.severity}</p>
+  </div>
                     </p>
 
                     {/* Always show the "Show Affected Counties" button */}
-                    <div className="text-sm mt-2">
+                    <div className="text-sm mt-1">
                       <button
                         className="text-white-500"
                         onClick={() => toggleCounties(index)} // Toggle counties for the clicked alert
