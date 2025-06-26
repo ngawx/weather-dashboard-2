@@ -210,7 +210,7 @@ function App() {
                     transition={{ duration: 0.4 }}
                   >
                     <h2 className="text-base font-semibold leading-snug">{event}</h2>
-                    <p className="text-[10px] mt-1 mb-4">
+                    <p className="text-[15px] mt-1 mb-4">
                       🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
                       ⏳ <strong>Expires:</strong> {formatTime(expires)}
                     </p>
