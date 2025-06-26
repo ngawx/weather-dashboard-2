@@ -88,6 +88,7 @@ function App() {
     if (lower.includes("watch")) return "bg-yellow-500 border-yellow-700 shadow-md";
     if (lower.includes("flood")) return "bg-green-700 border-green-900 shadow-md";
     if (lower.includes("heat")) return "bg-red-500 border-red-700 shadow-md";
+    if (lower.includes("special")) return "bg-lime-100 border-lime-200 shadow-md";
     return "bg-gray-600 border-gray-700 shadow-md";
   };
 
