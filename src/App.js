@@ -18,7 +18,7 @@ function App() {
   const countiesPeachtreeCity = [
     "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton", "Dade", "Walker", "Catoosa", "Whitfield", "Murray",
     "Gilmer", "Fannin", "Union", "Towns", "Rabun", "Habersham", "White", "Lumpkin", "Hall", "Cherokee", "Rockdale",
-    "Paulding", "Bartow", "Carroll", "Douglas", "Fayette", "Henry", "Butts", "Monroe", "Newton", "Walton"
+    "Paulding", "Bartow", "Carroll", "Douglas", "Fayette", "Henry", "Butts", "Monroe", "Newton", "Walton", "Jackson", "Clarke", "Banks", "Walton", "Newton", "Polk", "Forsyth", "Dawson"
   ];
 
   // Specific counties from NWS Greenville-Spartanburg to include
@@ -123,6 +123,7 @@ function App() {
     if (lower.includes("heat advisory")) return "bg-red-500 border-red-700 shadow-md"; // Heat Advisory
     if (lower.includes("heat")) return "bg-red-500 border-red-700 shadow-md";
     if (lower.includes("air quality")) return "bg-blue-500 border-blue-700 shadow-md"; // Air Quality
+    if (lower.includes("special weather statement")) return "bg-cyan-800 border-cyan-900 shadow-md"; 
     return "bg-gray-600 border-gray-700 shadow-md";
   };
 
