@@ -14,15 +14,17 @@ function App() {
   const alertsPerPage = 4;
   const resumeTimeout = useRef(null);
 
-  // Define alertCounts and ffcActiveAlertCount
-  const alertCounts = {
-    tornado: 0,
-    severe: 0,
-    severeWarn: 0,
-    flood: 0,
-    heat: 0,
-    cold: 0
-  };
+  // Define counties for NWS Peachtree City (FFC counties)
+  const countiesPeachtreeCity = [
+    "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton", "Dade", "Walker", "Catoosa", "Whitfield", "Murray",
+    "Gilmer", "Fannin", "Union", "Towns", "Rabun", "Habersham", "White", "Lumpkin", "Hall", "Cherokee", "Rockdale",
+    "Paulding", "Bartow", "Carroll", "Douglas", "Fayette", "Henry", "Butts", "Monroe", "Newton", "Walton"
+  ];
+
+  // Specific counties from NWS Greenville-Spartanburg to include
+  const countiesGreenvilleSpartanburg = [
+    "Rabun", "Stephens", "Hart", "Elbert" // Only these counties from NWS Greenville
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,7 +36,7 @@ function App() {
   useEffect(() => {
     const loadAlerts = async () => {
       try {
-        const data = await fetchWeatherAlerts();
+        const data = await fetchWeatherAlerts(); // Fetch alerts for all counties
         setAlerts(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching weather alerts:", error);
@@ -42,29 +44,60 @@ function App() {
       }
     };
     loadAlerts();
-    const interval = setInterval(loadAlerts, 60000);
+    const interval = setInterval(loadAlerts, 60000); // Refresh every minute
     return () => clearInterval(interval);
   }, []);
 
+  // Filter all alerts to only include those from Peachtree City (FFC) and Greenville-Spartanburg (GSP)
   const filteredAlerts = alerts.filter((alert) => {
-    const { event, senderName, effective, expires } = alert.properties;
-    const isFromFFC = senderName?.toLowerCase().includes("nws peachtree city");
+    const { event, senderName, effective, expires, areaDesc } = alert.properties;
+    
+    // Ensure the alert is active or in the future
     const now = new Date();
     const effectiveTime = new Date(effective);
     const expiresTime = new Date(expires);
     const isActiveOrFuture = (!isNaN(effectiveTime) && effectiveTime <= now && expiresTime >= now) || effectiveTime >= now;
-    return isFromFFC && isActiveOrFuture;
+
+    // Normalize senderName to lowercase for comparison (checking for Peachtree City and Greenville-Spartanburg)
+    const isFromPeachtreeCity = senderName?.toLowerCase().includes("nws peachtree city");
+    const isFromGreenvilleSpartanburg = senderName?.toLowerCase().includes("nws greenville-spartanburg");
+
+    // Normalize and clean the affected counties from areaDesc
+    const affectedCounties = areaDesc
+      .toLowerCase() // Make case-insensitive comparison
+      .split(",") // Split by comma to get each county
+      .map(county => county.trim()); // Clean up spaces around county names
+
+    // Check if any of the affected counties are in the Peachtree City or Greenville-Spartanburg lists
+    const isPeachtreeCityAlert = affectedCounties.some(county => countiesPeachtreeCity.map(c => c.toLowerCase()).includes(county));
+    const isGreenvilleSpartanburgAlert = affectedCounties.some(county => countiesGreenvilleSpartanburg.map(c => c.toLowerCase()).includes(county));
+
+    // Only include alerts from Peachtree City or Greenville-Spartanburg and affecting the right counties
+    return isActiveOrFuture && (isFromPeachtreeCity || (isFromGreenvilleSpartanburg && isGreenvilleSpartanburgAlert));
   });
 
   // Populate alertCounts based on filteredAlerts
+  const alertCounts = {
+    tornado: 0,
+    severe: 0,
+    severeWarn: 0,
+    flood: 0,
+    heat: 0,
+    cold: 0,
+    airQuality: 0,
+    heatAdvisory: 0
+  };
+
   filteredAlerts.forEach(alert => {
     const event = alert.properties.event.toLowerCase();
     if (event.includes("tornado")) alertCounts.tornado++;
     if (event.includes("severe") && event.includes("warning")) alertCounts.severeWarn++;
     if (event.includes("severe")) alertCounts.severe++;
     if (event.includes("flood")) alertCounts.flood++;
-    if (event.includes("heat")) alertCounts.heat++;
+    if (event.includes("heat advisory")) alertCounts.heatAdvisory++; // Heat Advisory Alerts
+    if (event.includes("heat")) alertCounts.heat++; // For Heat Advisory
     if (event.includes("cold") || event.includes("blizzard") || event.includes("freeze")) alertCounts.cold++;
+    if (event.includes("air quality")) alertCounts.airQuality++; // Air Quality Alerts
   });
 
   const ffcActiveAlertCount = filteredAlerts.length;
@@ -87,8 +120,9 @@ function App() {
     if (lower.includes("severe")) return "bg-orange-500 border-orange-700 shadow-md";
     if (lower.includes("watch")) return "bg-yellow-500 border-yellow-700 shadow-md";
     if (lower.includes("flood")) return "bg-green-700 border-green-900 shadow-md";
+    if (lower.includes("heat advisory")) return "bg-red-500 border-red-700 shadow-md"; // Heat Advisory
     if (lower.includes("heat")) return "bg-red-500 border-red-700 shadow-md";
-    if (lower.includes("special")) return "bg-cyan-800 border-cyan-900 shadow-md";
+    if (lower.includes("air quality")) return "bg-blue-500 border-blue-700 shadow-md"; // Air Quality
     return "bg-gray-600 border-gray-700 shadow-md";
   };
 
@@ -178,6 +212,7 @@ function App() {
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-green-500 to-green-700 cursor-pointer" title="Flash Flood, Flood Watch, Flood Warning">Flood: {alertCounts.flood}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-red-300 to-red-500 cursor-pointer" title="Excessive Heat Warning, Heat Advisory">Heat: {alertCounts.heat}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-blue-500 to-blue-900 cursor-pointer" title="Winter Storm Warning, Blizzard Warning, Freeze Warning">Cold: {alertCounts.cold}</div>
+           
           </div>
 
           <div className="text-sm font-semibold bg-gray-800 px-4 py-2 rounded-full border-2 border-white shadow-md mt-4">
@@ -210,9 +245,9 @@ function App() {
                     transition={{ duration: 0.4 }}
                   >
                     <h2 className="text-base font-semibold leading-snug">{event}</h2>
-                    <p className="text-[15px] mt-1 mb-4">
-                      🕒 <strong>Effective:</strong> {formatTime(effective)}<br />
-                      ⏳ <strong>Expires:</strong> {formatTime(expires)}
+                    <p className="text-[12px] mt-1 mb-4">
+                       <strong>Effective:</strong> {formatTime(effective)}<br />
+                       <strong>Expires:</strong> {formatTime(expires)}
                     </p>
 
                     {/* Always show the "Show Affected Counties" button */}
