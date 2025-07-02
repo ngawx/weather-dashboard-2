@@ -17,8 +17,8 @@ function App() {
   // Define counties for NWS Peachtree City (FFC counties)
   const countiesPeachtreeCity = [
     "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton", "Dade", "Walker", "Catoosa", "Whitfield", "Murray",
-    "Gilmer", "Fannin", "Union", "Towns", "Rabun", "Habersham", "White", "Lumpkin", "Hall", "Cherokee", "Rockdale",
-    "Paulding", "Bartow", "Carroll", "Douglas", "Fayette", "Henry", "Butts", "Monroe", "Newton", "Walton", "Jackson", "Clarke", "Banks", "Walton", "Newton", "Polk", "Forsyth", "Dawson"
+    "Gilmer", "Fannin", "Union", "Towns", "Rabun", "White", "Lumpkin", "Hall", "Cherokee", "Rockdale",
+    "Paulding", "Bartow", "Carroll", "Douglas", "Fayette", "Henry", "Butts", "Monroe", "Newton", "Walton", "Jackson", "Clarke", "Banks", "Walton", "Newton", "Polk", "Forsyth", "Dawson", "Habersham"
   ];
 
   // Specific counties from NWS Greenville-Spartanburg to include
