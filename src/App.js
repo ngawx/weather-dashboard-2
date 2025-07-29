@@ -207,7 +207,7 @@ function App() {
           </div>
 
             <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
-  <img src="/logo.png" alt="Logo" className="w-36 h-auto mt-4 mb-2 mx-auto" />
+  <img src="/logo.png" alt="Logo" className="w-36 h-25 mt-4 mb-2 mx-auto" />
 </div>      
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-red-500 to-red-900">Tornado: {alertCounts.tornado}</div>
