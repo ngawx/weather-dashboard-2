@@ -10,6 +10,8 @@ const cities = [
   { name: 'Peachtree City, GA', grid: ['FFC', '56', '83'] },
 ];
 
+const toFahrenheit = (c) => Math.round((c * 9) / 5 + 32);
+
 export default function ConditionsScroll() {
   const [index, setIndex] = useState(0);
   const [data, setData] = useState([]);
@@ -40,12 +42,12 @@ export default function ConditionsScroll() {
             const forecastJson = await forecastRes.json();
             const shortForecasts = forecastJson.properties.periods || [];
 
-            // Apply offset to get accurate future blocks
-            const forecast = temps.slice(offset, offset + 3).map((t, i) => ({
+            // Apply offset and fetch 4 hours (current + next 3)
+            const forecast = temps.slice(offset, offset + 4).map((t, i) => ({
               time: t.validTime.split("/")[0],
-              temperature: Math.round(t.value),
+              temperature: toFahrenheit(t.value),
               apparentTemperature:
-                apparentTemps[offset + i]?.value !== null ? Math.round(apparentTemps[offset + i].value) : null,
+                apparentTemps[offset + i]?.value !== null ? toFahrenheit(apparentTemps[offset + i].value) : null,
               probabilityOfPrecipitation:
                 pops[offset + i]?.value !== null ? Math.round(pops[offset + i].value) : null,
               shortForecast: shortForecasts[offset + i]?.shortForecast ?? ""
@@ -54,10 +56,10 @@ export default function ConditionsScroll() {
             return {
               city: city.name,
               current: {
-                temperature: temps[0]?.value !== null ? Math.round(temps[0].value) : null,
+                temperature: toFahrenheit(temps[offset]?.value),
                 apparentTemperature:
-                  apparentTemps[0]?.value !== null ? Math.round(apparentTemps[0].value) : null,
-                shortForecast: shortForecasts[0]?.shortForecast ?? ""
+                  apparentTemps[offset]?.value !== null ? toFahrenheit(apparentTemps[offset].value) : null,
+                shortForecast: shortForecasts[offset]?.shortForecast ?? ""
               },
               forecast
             };
