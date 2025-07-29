@@ -21,8 +21,16 @@ export default function ConditionsScroll() {
     const fetchAll = async () => {
       try {
         const now = new Date();
-        now.setMinutes(0, 0, 0); // Round to top of hour
-        const currentHourISO = now.toISOString();
+        now.setMinutes(0, 0, 0);
+
+        // Format as "YYYY-MM-DDTHH" in America/New_York
+        const currentHourLocalPrefix = now
+          .toLocaleString('sv-SE', {
+            timeZone: 'America/New_York',
+            hour12: false,
+          })
+          .replace(' ', 'T')
+          .slice(0, 13); // Example: "2025-07-29T14"
 
         const results = await Promise.all(
           cities.map(async (city) => {
@@ -42,8 +50,9 @@ export default function ConditionsScroll() {
               const forecastJson = await forecastRes.json();
               const shortForecasts = forecastJson.properties.periods || [];
 
+              // Find current hour index
               const startIndex = temps.findIndex((t) =>
-                t.validTime.startsWith(currentHourISO)
+                t.validTime.startsWith(currentHourLocalPrefix)
               );
 
               if (startIndex === -1) {
@@ -90,7 +99,6 @@ export default function ConditionsScroll() {
           })
         );
 
-        // Filter out any failed cities
         setData(results.filter(Boolean));
       } catch (error) {
         console.error('Error fetching weather data:', error);
