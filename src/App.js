@@ -11,7 +11,7 @@ function App() {
   const [selectedMap, setSelectedMap] = useState("radar");
   const [expandedIndex, setExpandedIndex] = useState(null); // Track which alert is expanded
   const [showCounties, setShowCounties] = useState({}); // Track counties visibility per alert
-  const alertsPerPage = 4;
+  const alertsPerPage = 3;
   const resumeTimeout = useRef(null);
 
   // Define counties for NWS Peachtree City (FFC counties)
