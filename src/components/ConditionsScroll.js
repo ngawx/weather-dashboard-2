@@ -19,38 +19,40 @@ export default function ConditionsScroll() {
       try {
         const results = await Promise.all(
           cities.map(async (city) => {
-            const res = await fetch(
+            // Fetch gridpoints data
+            const gridRes = await fetch(
               `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}`
             );
-            const json = await res.json();
+            const gridJson = await gridRes.json();
 
-            const apparentTemps = json.properties.apparentTemperature.values;
-            const temps = json.properties.temperature.values;
-            const forecasts = json.properties.shortForecast.values;
-            const pops = json.properties.probabilityOfPrecipitation.values;
+            const apparentTemps = gridJson.properties.apparentTemperature?.values || [];
+            const temps = gridJson.properties.temperature?.values || [];
+            const pops = gridJson.properties.probabilityOfPrecipitation?.values || [];
 
-            // Extract the next 3 forecast periods
-            const getUpcoming = (values) => {
-              return values.slice(0, 3).map((v) => ({
-                time: v.validTime.split("/")[0],
-                value: v.value
-              }));
-            };
+            // Fetch hourly forecast for shortForecast
+            const forecastRes = await fetch(
+              `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
+            );
+            const forecastJson = await forecastRes.json();
+            const shortForecasts = forecastJson.properties.periods || [];
+
+            // Construct forecast entries
+            const forecast = temps.slice(0, 3).map((t, i) => ({
+              time: t.validTime.split("/")[0],
+              temperature: t.value,
+              apparentTemperature: apparentTemps[i]?.value ?? null,
+              probabilityOfPrecipitation: pops[i]?.value ?? null,
+              shortForecast: shortForecasts[i]?.shortForecast ?? ""
+            }));
 
             return {
               city: city.name,
               current: {
                 temperature: temps[0]?.value,
                 apparentTemperature: apparentTemps[0]?.value,
-                shortForecast: forecasts[0]?.value,
+                shortForecast: shortForecasts[0]?.shortForecast ?? ""
               },
-              forecast: getUpcoming(temps).map((t, i) => ({
-                time: t.time,
-                temperature: t.value,
-                apparentTemperature: apparentTemps[i]?.value,
-                shortForecast: forecasts[i]?.value,
-                probabilityOfPrecipitation: pops[i]?.value
-              }))
+              forecast
             };
           })
         );
@@ -86,12 +88,8 @@ export default function ConditionsScroll() {
           <div className="text-base font-medium">
             Temp: {cityData.current.temperature}°F
           </div>
-          <div className="text-sm">
-            Feels Like: {cityData.current.apparentTemperature}°F
-          </div>
-          <div className="text-sm mt-1 italic">
-            {cityData.current.shortForecast}
-          </div>
+          <div className="text-sm">Feels Like: {cityData.current.apparentTemperature}°F</div>
+          <div className="text-sm mt-1 italic">{cityData.current.shortForecast}</div>
         </div>
 
         <div className="flex flex-col gap-2 w-full">
