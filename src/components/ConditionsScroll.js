@@ -86,7 +86,7 @@ const next = json.properties.periods.slice(offset, offset + 3);
               </div>
               <div className="font-semibold text-white mb-1">{period.name}</div>
               <div className="text-white">{period.temperature}°{period.temperatureUnit}</div>
-              <div className="text-white">{period.heatIndex}°{period.temperatureUnit}</div>
+              <div className="text-white">{period.dewpoint}°{period.temperatureUnit}</div>
               <div className="text-white text-xs mt-1">{period.shortForecast}</div>
               {period.probabilityOfPrecipitation && period.probabilityOfPrecipitation.value !== null && (
                 <div className="text-white text-xs mt-1">Precip: {period.probabilityOfPrecipitation.value}%</div>
