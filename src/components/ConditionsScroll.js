@@ -10,9 +10,6 @@ const cities = [
   { name: 'Peachtree City, GA', grid: ['FFC', '56', '83'] },
 ];
 
-// Convert Celsius to Fahrenheit and round
-const toFahrenheit = (tempC) => Math.round((tempC * 9) / 5 + 32);
-
 export default function ConditionsScroll() {
   const [index, setIndex] = useState(0);
   const [data, setData] = useState([]);
@@ -20,9 +17,6 @@ export default function ConditionsScroll() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const now = new Date();
-        const currentHour = now.getHours();
-
         const results = await Promise.all(
           cities.map(async (city) => {
             const res = await fetch(
@@ -31,29 +25,61 @@ export default function ConditionsScroll() {
             const json = await res.json();
             const periods = json.properties.periods;
 
-            // Find current hour forecast index
-            const nowUTC = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-            const currentIndex = periods.findIndex((p) =>
-              p.startTime.startsWith(nowUTC)
-            );
+            // Find the index of the forecast for the current hour (Eastern Time)
+            const startIndex = periods.findIndex((t) => {
+              const tHour = new Date(t.startTime).getHours();
+              const tDate = new Date(t.startTime).toLocaleDateString('en-US', {
+                timeZone: 'America/New_York',
+              });
 
-            if (currentIndex === -1) {
+              const now = new Date();
+              const currentHour = now.toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+                hour: '2-digit',
+                hour12: false,
+              });
+              const currentDate = now.toLocaleDateString('en-US', {
+                timeZone: 'America/New_York',
+              });
+
+              return (
+                tHour === parseInt(currentHour) && tDate === currentDate
+              );
+            });
+
+            if (startIndex === -1) {
               console.warn(`Skipping ${city.name} — no matching hour found`);
               return null;
             }
 
-            const current = periods[currentIndex];
-            const forecast = periods.slice(currentIndex + 1, currentIndex + 4);
+            const forecast = periods.slice(startIndex, startIndex + 4).map((t) => ({
+              time: new Date(t.startTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+              temperature: Math.round(t.temperature),
+              apparentTemperature:
+                t.apparentTemperature !== null &&
+                typeof t.apparentTemperature === 'object' &&
+                typeof t.apparentTemperature.value === 'number'
+                  ? Math.round(t.apparentTemperature.value)
+                  : null,
+              probabilityOfPrecipitation:
+                t.probabilityOfPrecipitation?.value !== null
+                  ? Math.round(t.probabilityOfPrecipitation.value)
+                  : null,
+              shortForecast: t.shortForecast,
+              name: t.name,
+            }));
 
             return {
               city: city.name,
-              current,
-              forecast,
+              current: forecast[0],
+              forecast: forecast.slice(1),
             };
           })
         );
 
-        // Filter out any null entries
         setData(results.filter(Boolean));
       } catch (error) {
         console.error('Error fetching weather data:', error);
@@ -83,7 +109,7 @@ export default function ConditionsScroll() {
         <div className="current-condition-box text-center bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
           <div className="text-xs italic mb-1">Currently</div>
           <div className="text-base font-medium">
-            {toFahrenheit(cityData.current.temperature)}°F – {cityData.current.shortForecast}
+            {cityData.current.temperature}°F – {cityData.current.shortForecast}
           </div>
         </div>
 
@@ -93,28 +119,20 @@ export default function ConditionsScroll() {
               key={idx}
               className="forecast-hour p-2 rounded shadow text-center text-sm bg-gradient-to-b from-blue-900 to-blue-600 border border-white"
             >
-              <div className="font-bold text-white mb-1 text-sm">
-                {new Date(period.startTime).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </div>
+              <div className="font-bold text-white mb-1 text-sm">{period.time}</div>
               <div className="font-semibold text-white mb-1">{period.name}</div>
+              <div className="text-white">{period.temperature}°F</div>
               <div className="text-white">
-                {toFahrenheit(period.temperature)}°F
-              </div>
-              <div className="text-white">
-                {typeof period.apparentTemperature?.value === 'number'
-                  ? `${toFahrenheit(period.apparentTemperature.value)}°F`
+                {period.apparentTemperature !== null
+                  ? `Feels like: ${period.apparentTemperature}°F`
                   : 'Feels like: N/A'}
               </div>
               <div className="text-white text-xs mt-1">{period.shortForecast}</div>
-              {period.probabilityOfPrecipitation &&
-                period.probabilityOfPrecipitation.value !== null && (
-                  <div className="text-white text-xs mt-1">
-                    Precip: {period.probabilityOfPrecipitation.value}%
-                  </div>
-                )}
+              {period.probabilityOfPrecipitation !== null && (
+                <div className="text-white text-xs mt-1">
+                  Precip: {period.probabilityOfPrecipitation}%
+                </div>
+              )}
             </div>
           ))}
         </div>
