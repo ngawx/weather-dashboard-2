@@ -59,11 +59,9 @@ export default function ConditionsScroll() {
               }),
               temperature: Math.round(t.temperature),
               apparentTemperature:
-                t.apparentTemperature !== null &&
-                typeof t.apparentTemperature === 'object' &&
-                typeof t.apparentTemperature.value === 'number'
-                  ? Math.round(t.apparentTemperature.value)
-                  : null,
+  typeof t.apparentTemperature?.value === 'number'
+    ? Math.round(t.apparentTemperature.value)
+    : null,
               probabilityOfPrecipitation:
                 t.probabilityOfPrecipitation?.value !== null
                   ? Math.round(t.probabilityOfPrecipitation.value)
