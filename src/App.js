@@ -206,6 +206,11 @@ function App() {
             {currentTime.toLocaleTimeString()} {timeSuffix}
           </div>
 
+            <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
+            <img src="/Adobe Express - file.png" alt="Logo" className="w-36 h-auto mt-4 mb-2 mx-auto" />
+
+<div className="w-full flex flex-wrap justify-center gap-2 px-4">
+            
           <div className="w-full flex flex-wrap justify-center gap-2 px-4 mt-2">
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-red-500 to-red-900">Tornado: {alertCounts.tornado}</div>
             <div className="px-2 py-1 rounded text-white bg-gradient-to-b from-orange-500 to-orange-900">Svr T-Storm: {alertCounts.severeWarn}</div>
