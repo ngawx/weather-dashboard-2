@@ -10,6 +10,7 @@ const cities = [
   { name: 'Peachtree City, GA', grid: ['FFC', '56', '83'] },
 ];
 
+// Convert Celsius to Fahrenheit
 const toFahrenheit = (c) => Math.round((c * 9) / 5 + 32);
 
 export default function ConditionsScroll() {
@@ -20,12 +21,11 @@ export default function ConditionsScroll() {
     const fetchAll = async () => {
       try {
         const now = new Date();
-        const currentMinute = now.getMinutes();
-        const offset = currentMinute >= 30 ? 1 : 0;
+        now.setMinutes(0, 0, 0); // Round down to the current hour
+        const currentHourISO = now.toISOString();
 
         const results = await Promise.all(
           cities.map(async (city) => {
-            // Fetch gridpoints data
             const gridRes = await fetch(
               `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}`
             );
@@ -35,40 +35,55 @@ export default function ConditionsScroll() {
             const temps = gridJson.properties.temperature?.values || [];
             const pops = gridJson.properties.probabilityOfPrecipitation?.values || [];
 
-            // Fetch hourly forecast for shortForecast
             const forecastRes = await fetch(
               `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
             );
             const forecastJson = await forecastRes.json();
             const shortForecasts = forecastJson.properties.periods || [];
 
-            // Apply offset and fetch 4 hours (current + next 3)
-            const forecast = temps.slice(offset, offset + 4).map((t, i) => ({
-              time: t.validTime.split("/")[0],
-              temperature: toFahrenheit(t.value),
-              apparentTemperature:
-                apparentTemps[offset + i]?.value !== null ? toFahrenheit(apparentTemps[offset + i].value) : null,
-              probabilityOfPrecipitation:
-                pops[offset + i]?.value !== null ? Math.round(pops[offset + i].value) : null,
-              shortForecast: shortForecasts[offset + i]?.shortForecast ?? ""
-            }));
+            // Find the index for the current hour
+            const startIndex = temps.findIndex((t) =>
+              t.validTime.startsWith(currentHourISO)
+            );
+
+            const forecast = temps.slice(startIndex, startIndex + 4).map((t, i) => {
+              const time = t.validTime.split('/')[0];
+              return {
+                time,
+                temperature: toFahrenheit(t.value),
+                apparentTemperature:
+                  apparentTemps[startIndex + i]?.value !== null
+                    ? toFahrenheit(apparentTemps[startIndex + i].value)
+                    : null,
+                probabilityOfPrecipitation:
+                  pops[startIndex + i]?.value !== null
+                    ? Math.round(pops[startIndex + i].value)
+                    : null,
+                shortForecast: shortForecasts[i]?.shortForecast ?? '',
+              };
+            });
 
             return {
               city: city.name,
               current: {
-                temperature: toFahrenheit(temps[offset]?.value),
+                temperature:
+                  temps[startIndex]?.value !== null
+                    ? toFahrenheit(temps[startIndex].value)
+                    : null,
                 apparentTemperature:
-                  apparentTemps[offset]?.value !== null ? toFahrenheit(apparentTemps[offset].value) : null,
-                shortForecast: shortForecasts[offset]?.shortForecast ?? ""
+                  apparentTemps[startIndex]?.value !== null
+                    ? toFahrenheit(apparentTemps[startIndex].value)
+                    : null,
+                shortForecast: shortForecasts[0]?.shortForecast ?? '',
               },
-              forecast
+              forecast,
             };
           })
         );
 
         setData(results);
       } catch (error) {
-        console.error("Error fetching weather data:", error);
+        console.error('Error fetching weather data:', error);
       }
     };
 
@@ -90,14 +105,18 @@ export default function ConditionsScroll() {
   return (
     <div className="scroll-box fancy-gradient w-full">
       <div className="scroll-entry white-outline w-full">
-        <div className="city-name text-xl font-semibold text-center mb-2">{cityData.city}</div>
+        <div className="city-name text-xl font-semibold text-center mb-2">
+          {cityData.city}
+        </div>
 
         <div className="current-condition-box text-center bg-blue-700 text-white p-2 mb-4 rounded shadow border border-white">
           <div className="text-xs italic mb-1">Currently</div>
           <div className="text-base font-medium">
             Temp: {cityData.current.temperature}°F
           </div>
-          <div className="text-sm">Feels Like: {cityData.current.apparentTemperature}°F</div>
+          <div className="text-sm">
+            Feels Like: {cityData.current.apparentTemperature}°F
+          </div>
           <div className="text-sm mt-1 italic">{cityData.current.shortForecast}</div>
         </div>
 
@@ -110,11 +129,13 @@ export default function ConditionsScroll() {
               <div className="font-bold text-white mb-1 text-sm">
                 {new Date(period.time).toLocaleTimeString([], {
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 })}
               </div>
               <div className="text-white">Temp: {period.temperature}°F</div>
-              <div className="text-white">Feels Like: {period.apparentTemperature}°F</div>
+              <div className="text-white">
+                Feels Like: {period.apparentTemperature}°F
+              </div>
               <div className="text-white text-xs mt-1">{period.shortForecast}</div>
               {period.probabilityOfPrecipitation !== null && (
                 <div className="text-white text-xs mt-1">
