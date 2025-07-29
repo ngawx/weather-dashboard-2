@@ -17,6 +17,10 @@ export default function ConditionsScroll() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
+        const now = new Date();
+        const currentMinute = now.getMinutes();
+        const offset = currentMinute >= 30 ? 1 : 0;
+
         const results = await Promise.all(
           cities.map(async (city) => {
             // Fetch gridpoints data
@@ -36,20 +40,23 @@ export default function ConditionsScroll() {
             const forecastJson = await forecastRes.json();
             const shortForecasts = forecastJson.properties.periods || [];
 
-            // Construct forecast entries
-            const forecast = temps.slice(0, 3).map((t, i) => ({
+            // Apply offset to get accurate future blocks
+            const forecast = temps.slice(offset, offset + 3).map((t, i) => ({
               time: t.validTime.split("/")[0],
-              temperature: t.value,
-              apparentTemperature: apparentTemps[i]?.value ?? null,
-              probabilityOfPrecipitation: pops[i]?.value ?? null,
-              shortForecast: shortForecasts[i]?.shortForecast ?? ""
+              temperature: Math.round(t.value),
+              apparentTemperature:
+                apparentTemps[offset + i]?.value !== null ? Math.round(apparentTemps[offset + i].value) : null,
+              probabilityOfPrecipitation:
+                pops[offset + i]?.value !== null ? Math.round(pops[offset + i].value) : null,
+              shortForecast: shortForecasts[offset + i]?.shortForecast ?? ""
             }));
 
             return {
               city: city.name,
               current: {
-                temperature: temps[0]?.value,
-                apparentTemperature: apparentTemps[0]?.value,
+                temperature: temps[0]?.value !== null ? Math.round(temps[0].value) : null,
+                apparentTemperature:
+                  apparentTemps[0]?.value !== null ? Math.round(apparentTemps[0].value) : null,
                 shortForecast: shortForecasts[0]?.shortForecast ?? ""
               },
               forecast
