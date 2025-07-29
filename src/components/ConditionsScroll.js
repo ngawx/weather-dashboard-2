@@ -21,67 +21,77 @@ export default function ConditionsScroll() {
     const fetchAll = async () => {
       try {
         const now = new Date();
-        now.setMinutes(0, 0, 0); // Round down to the current hour
+        now.setMinutes(0, 0, 0); // Round to top of hour
         const currentHourISO = now.toISOString();
 
         const results = await Promise.all(
           cities.map(async (city) => {
-            const gridRes = await fetch(
-              `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}`
-            );
-            const gridJson = await gridRes.json();
+            try {
+              const gridRes = await fetch(
+                `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}`
+              );
+              const gridJson = await gridRes.json();
 
-            const apparentTemps = gridJson.properties.apparentTemperature?.values || [];
-            const temps = gridJson.properties.temperature?.values || [];
-            const pops = gridJson.properties.probabilityOfPrecipitation?.values || [];
+              const apparentTemps = gridJson.properties.apparentTemperature?.values || [];
+              const temps = gridJson.properties.temperature?.values || [];
+              const pops = gridJson.properties.probabilityOfPrecipitation?.values || [];
 
-            const forecastRes = await fetch(
-              `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
-            );
-            const forecastJson = await forecastRes.json();
-            const shortForecasts = forecastJson.properties.periods || [];
+              const forecastRes = await fetch(
+                `https://api.weather.gov/gridpoints/${city.grid[0]}/${city.grid[1]},${city.grid[2]}/forecast/hourly`
+              );
+              const forecastJson = await forecastRes.json();
+              const shortForecasts = forecastJson.properties.periods || [];
 
-            // Find the index for the current hour
-            const startIndex = temps.findIndex((t) =>
-              t.validTime.startsWith(currentHourISO)
-            );
+              const startIndex = temps.findIndex((t) =>
+                t.validTime.startsWith(currentHourISO)
+              );
 
-            const forecast = temps.slice(startIndex, startIndex + 4).map((t, i) => {
-              const time = t.validTime.split('/')[0];
+              if (startIndex === -1) {
+                console.warn(`Skipping ${city.name} — no matching hour found`);
+                return null;
+              }
+
+              const forecast = temps.slice(startIndex, startIndex + 4).map((t, i) => {
+                const time = t.validTime.split('/')[0];
+                return {
+                  time,
+                  temperature: toFahrenheit(t.value),
+                  apparentTemperature:
+                    apparentTemps[startIndex + i]?.value !== null
+                      ? toFahrenheit(apparentTemps[startIndex + i].value)
+                      : null,
+                  probabilityOfPrecipitation:
+                    pops[startIndex + i]?.value !== null
+                      ? Math.round(pops[startIndex + i].value)
+                      : null,
+                  shortForecast: shortForecasts[i]?.shortForecast ?? '',
+                };
+              });
+
               return {
-                time,
-                temperature: toFahrenheit(t.value),
-                apparentTemperature:
-                  apparentTemps[startIndex + i]?.value !== null
-                    ? toFahrenheit(apparentTemps[startIndex + i].value)
-                    : null,
-                probabilityOfPrecipitation:
-                  pops[startIndex + i]?.value !== null
-                    ? Math.round(pops[startIndex + i].value)
-                    : null,
-                shortForecast: shortForecasts[i]?.shortForecast ?? '',
+                city: city.name,
+                current: {
+                  temperature:
+                    temps[startIndex]?.value !== null
+                      ? toFahrenheit(temps[startIndex].value)
+                      : null,
+                  apparentTemperature:
+                    apparentTemps[startIndex]?.value !== null
+                      ? toFahrenheit(apparentTemps[startIndex].value)
+                      : null,
+                  shortForecast: shortForecasts[0]?.shortForecast ?? '',
+                },
+                forecast,
               };
-            });
-
-            return {
-              city: city.name,
-              current: {
-                temperature:
-                  temps[startIndex]?.value !== null
-                    ? toFahrenheit(temps[startIndex].value)
-                    : null,
-                apparentTemperature:
-                  apparentTemps[startIndex]?.value !== null
-                    ? toFahrenheit(apparentTemps[startIndex].value)
-                    : null,
-                shortForecast: shortForecasts[0]?.shortForecast ?? '',
-              },
-              forecast,
-            };
+            } catch (cityError) {
+              console.error(`Error fetching data for ${city.name}:`, cityError);
+              return null;
+            }
           })
         );
 
-        setData(results);
+        // Filter out any failed cities
+        setData(results.filter(Boolean));
       } catch (error) {
         console.error('Error fetching weather data:', error);
       }
