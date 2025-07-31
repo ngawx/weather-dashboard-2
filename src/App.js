@@ -178,7 +178,7 @@ function App() {
           <img
             src={
               selectedMap === "radar"
-                ? `https://radar.weather.gov/ridge/standard/KFFC_0.gif?${Date.now()}`
+                ? `https://radar.weather.gov/ridge/standard/KFFC_loop.gif?refreshed=1753995922599`
                 : selectedMap === "alerts"
                 ? "https://www.weather.gov/images/ffc/big/GA_WWA.png"
                 : "https://www.spc.noaa.gov/products/activity_loop.gif"
